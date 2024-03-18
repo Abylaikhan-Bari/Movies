@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.aikei.movies.R
 import com.aikei.movies.databinding.ItemMovieBinding
 import com.aikei.movies.api.model.Movie
 
@@ -43,8 +44,9 @@ class MoviesAdapter(
             // Load movie poster using Coil with the full URL
             binding.moviePosterImage.load(baseImageUrl + movie.posterUrl) {
                 crossfade(true)
-                placeholder(android.R.drawable.stat_sys_download) // Replace with your placeholder
-                error(android.R.drawable.stat_notify_error) // Replace with your error image
+                // Use actual placeholders and error drawables
+                placeholder(R.drawable.ic_placeholder) // Replace with your placeholder
+                error(R.drawable.ic_error) // Replace with your error image
             }
             // Set click listener for movie item, if provided
             onItemClick?.let { click ->
