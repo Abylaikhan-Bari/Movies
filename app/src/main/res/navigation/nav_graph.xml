@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/moviesListFragment">
+
+    <fragment
+        android:id="@+id/moviesListFragment"
+        android:name="com.aikei.movies.ui.fragment.MoviesListFragment"
+        android:label="Movies List">
+        <action
+            android:id="@+id/action_moviesListFragment_to_movieDetailFragment"
+            app:destination="@id/movieDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/movieDetailFragment"
+        android:name="com.aikei.movies.ui.fragment.MovieDetailFragment"
+        android:label="fragment_movie_detail"
+        tools:layout="@layout/fragment_movie_detail">
+        <argument
+            android:name="movieId"
+            app:argType="integer" />
+    </fragment>
+
+
+
+
+</navigation>

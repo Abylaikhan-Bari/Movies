@@ -1,19 +1,20 @@
 package com.aikei.movies.ui.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.aikei.movies.R
-import com.aikei.movies.databinding.ItemMovieBinding
 import com.aikei.movies.api.model.Movie
+import com.aikei.movies.databinding.ItemMovieBinding
 
 class MoviesAdapter(
     private var movies: List<Movie>,
-    private val onItemClick: ((Movie) -> Unit)? = null, // Click listener for movie item, optional
-    private val baseImageUrl: String = "https://image.tmdb.org/t/p/w500"
+    private val onItemClick: ((Movie) -> Unit)? // Optional click listener for movie item
 ) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>() {
+
+    // Optional: You can make the baseImageUrl a companion object if it doesn't change
+    private val baseImageUrl: String = "https://image.tmdb.org/t/p/w500"
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
         val binding = ItemMovieBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -22,7 +23,6 @@ class MoviesAdapter(
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
         val movie = movies[position]
-        Log.d("MoviesAdapter", "Binding movie: ${movie.title}")
         holder.bind(movie)
     }
 
@@ -33,26 +33,24 @@ class MoviesAdapter(
         notifyDataSetChanged()
     }
 
-    inner class MovieViewHolder(
+    class MovieViewHolder(
         private val binding: ItemMovieBinding,
-        private val onItemClick: ((Movie) -> Unit)?, // Injecting click listener
-        private val baseImageUrl: String // Injecting base URL for images
+        private val onItemClick: ((Movie) -> Unit)?, // Click listener for movie item
+        private val baseImageUrl: String // Base URL for images
     ) : RecyclerView.ViewHolder(binding.root) {
+
         fun bind(movie: Movie) {
-            Log.d("MoviesAdapter", "Loading URL: ${baseImageUrl + movie.posterUrl}")
             binding.movieTitleText.text = movie.title
-            // Load movie poster using Coil with the full URL
             binding.moviePosterImage.load(baseImageUrl + movie.posterUrl) {
                 crossfade(true)
-                // Use actual placeholders and error drawables
-                placeholder(R.drawable.ic_placeholder) // Replace with your placeholder
-                error(R.drawable.ic_error) // Replace with your error image
+                placeholder(R.drawable.ic_placeholder)
+                error(R.drawable.ic_error)
             }
-            // Set click listener for movie item, if provided
-            onItemClick?.let { click ->
-                binding.root.setOnClickListener {
-                    click(movie)
-                }
+
+
+            // Invoke click listener when the item view is clicked
+            itemView.setOnClickListener {
+                onItemClick?.invoke(movie)
             }
         }
     }

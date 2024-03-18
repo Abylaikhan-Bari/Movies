@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.aikei.movies.MyApp
 import com.aikei.movies.databinding.FragmentMoviesListBinding
@@ -29,18 +30,21 @@ class MoviesListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize the adapter with an empty list
-        moviesAdapter = MoviesAdapter(emptyList())
+        // Initialize the adapter with an empty list and set up click listener to navigate
+        moviesAdapter = MoviesAdapter(emptyList()) { movie ->
+            val action = MoviesListFragmentDirections.actionMoviesListFragmentToMovieDetailFragment(movie.id)
+            findNavController().navigate(action)
+
+
+        }
         setupRecyclerView()
 
         val factory = ViewModelFactory((activity?.application as MyApp).repository)
         viewModel = ViewModelProvider(this, factory).get(MoviesViewModel::class.java)
 
-        // Observe the LiveData from the ViewModel
         viewModel.getPopularMovies("16d4b76831709bc650217ad5df094731").observe(viewLifecycleOwner) { movies ->
-            // When movie data changes, update the adapter's dataset
             movies?.let {
-                moviesAdapter.updateMovies(it) // Call your update method here
+                moviesAdapter.updateMovies(it) // Update adapter's dataset
             }
         }
     }
@@ -49,7 +53,6 @@ class MoviesListFragment : Fragment() {
         binding.moviesRecyclerView.layoutManager = GridLayoutManager(context, 3)
         binding.moviesRecyclerView.adapter = moviesAdapter
     }
-
 
     companion object {
         fun newInstance(): MoviesListFragment = MoviesListFragment()

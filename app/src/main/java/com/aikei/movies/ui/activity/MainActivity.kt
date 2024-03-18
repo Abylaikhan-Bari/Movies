@@ -2,24 +2,34 @@ package com.aikei.movies.ui.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.aikei.movies.MyApp
+import androidx.appcompat.widget.Toolbar // Corrected import
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupActionBarWithNavController
 import com.aikei.movies.R
-import com.aikei.movies.ui.fragment.MoviesListFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Example of accessing MyApp and its repository property
-        // This is just a demonstration and might not be necessary for your current implementation
-        val app = application as MyApp
-        val repository = app.repository
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, MoviesListFragment.newInstance())
-                .commit()
+        // Ensuring this is correctly retrieving the NavController
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment?
+        val navController = navHostFragment?.navController
+        if (navController != null) {
+            setupActionBarWithNavController(navController)
+        } else {
+            throw RuntimeException("NavController not found")
         }
     }
+
+    override fun onSupportNavigateUp(): Boolean {
+        // Ensure safe call
+        val navController = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment?
+        return navController?.navController?.navigateUp() ?: false || super.onSupportNavigateUp()
+    }
 }
+
