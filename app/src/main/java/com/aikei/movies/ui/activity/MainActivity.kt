@@ -18,8 +18,8 @@ class MainActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.main_container, MoviesListFragment.newInstance())
-                .commitNow()
+                .replace(R.id.fragment_container, MoviesListFragment.newInstance())
+                .commit()
         }
     }
 }

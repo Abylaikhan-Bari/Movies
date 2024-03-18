@@ -29,24 +29,27 @@ class MoviesListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        moviesAdapter = MoviesAdapter(emptyList()) // Initialize with an empty list
+        // Initialize the adapter with an empty list
+        moviesAdapter = MoviesAdapter(emptyList())
         setupRecyclerView()
 
         val factory = ViewModelFactory((activity?.application as MyApp).repository)
         viewModel = ViewModelProvider(this, factory).get(MoviesViewModel::class.java)
 
+        // Observe the LiveData from the ViewModel
         viewModel.getPopularMovies("16d4b76831709bc650217ad5df094731").observe(viewLifecycleOwner) { movies ->
+            // When movie data changes, update the adapter's dataset
             movies?.let {
-                moviesAdapter = MoviesAdapter(it)
-                binding.moviesRecyclerView.adapter = moviesAdapter
+                moviesAdapter.updateMovies(it) // Call your update method here
             }
         }
     }
 
     private fun setupRecyclerView() {
         binding.moviesRecyclerView.layoutManager = GridLayoutManager(context, 3)
-        binding.moviesRecyclerView.adapter = moviesAdapter // Use the adapter initialized earlier
+        binding.moviesRecyclerView.adapter = moviesAdapter
     }
+
 
     companion object {
         fun newInstance(): MoviesListFragment = MoviesListFragment()

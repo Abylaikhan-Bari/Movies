@@ -4,10 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Add your fragment container here -->
-    <fragment
+    <!-- This FrameLayout will be the container for your fragment -->
+    <FrameLayout
         android:id="@+id/fragment_container"
-        android:name="com.aikei.movies.ui.fragment.MoviesListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
