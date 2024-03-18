@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import com.aikei.movies.MyApp
 import com.aikei.movies.databinding.FragmentMoviesListBinding
 import com.aikei.movies.repository.MoviesRepository
@@ -28,6 +28,8 @@ class MoviesListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        moviesAdapter = MoviesAdapter(emptyList()) // Initialize with an empty list
         setupRecyclerView()
 
         val factory = ViewModelFactory((activity?.application as MyApp).repository)
@@ -42,10 +44,8 @@ class MoviesListFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        binding.moviesRecyclerView.layoutManager = LinearLayoutManager(context)
-        // Initial empty adapter; data will be set upon receiving from ViewModel
-        moviesAdapter = MoviesAdapter(emptyList())
-        binding.moviesRecyclerView.adapter = moviesAdapter
+        binding.moviesRecyclerView.layoutManager = GridLayoutManager(context, 3)
+        binding.moviesRecyclerView.adapter = moviesAdapter // Use the adapter initialized earlier
     }
 
     companion object {
