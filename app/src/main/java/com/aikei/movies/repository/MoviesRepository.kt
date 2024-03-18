@@ -36,7 +36,6 @@ class MoviesRepository(private val moviesApiService: MoviesApiService) {
             }
         })
 
-
         return data
     }
 
@@ -50,16 +49,26 @@ class MoviesRepository(private val moviesApiService: MoviesApiService) {
                     data.postValue(response.body())
                 } else {
                     Log.e(TAG, "getMovieDetails: error ${response.code()} ${response.message()}")
-                    data.postValue(null) // Consider posting a specific error state
+                    if (response.code() == 404) {
+                        Log.e(TAG, "getMovieDetails: movie not found")
+                        data.postValue(null)
+                    } else {
+                        // Handle other error cases as needed
+                        Log.e(TAG, "getMovieDetails: other error occurred")
+                        data.postValue(null)
+                    }
                 }
             }
 
             override fun onFailure(call: Call<MovieDetails>, t: Throwable) {
                 Log.e(TAG, "getMovieDetails: onFailure", t)
-                data.postValue(null) // Consider posting a specific error state
+                data.postValue(null)
             }
         })
 
         return data
     }
+
+
+
 }

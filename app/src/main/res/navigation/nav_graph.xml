@@ -17,7 +17,7 @@
     <fragment
         android:id="@+id/movieDetailFragment"
         android:name="com.aikei.movies.ui.fragment.MovieDetailFragment"
-        android:label="fragment_movie_detail"
+        android:label="Movie detail"
         tools:layout="@layout/fragment_movie_detail">
         <argument
             android:name="movieId"

@@ -15,7 +15,7 @@ class MyApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Configure logging interceptor to log the body of the response
+        // Configure logging interceptor to log the body of the responses
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
@@ -25,17 +25,17 @@ class MyApp : Application() {
             .addInterceptor(logging)
             .build()
 
-        // Initialize Retrofit with the OkHttpClient that includes logging interceptor
+        // Initialize Retrofit with the OkHttpClient that includes the logging interceptor
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.themoviedb.org/3/")
+            .baseUrl("https://api.themoviedb.org/3/") // Ensure this is the correct base URL for your API
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        // Create an instance of the MoviesApiService
+        // Create an instance of the MoviesApiService using Retrofit
         val moviesApiService = retrofit.create(MoviesApiService::class.java)
 
-        // Initialize your MoviesRepository with the API service
+        // Initialize the MoviesRepository with the MoviesApiService
         repository = MoviesRepository(moviesApiService)
     }
 }

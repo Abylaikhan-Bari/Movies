@@ -40,7 +40,7 @@ class MoviesListFragment : Fragment() {
         setupRecyclerView()
 
         val factory = ViewModelFactory((activity?.application as MyApp).repository)
-        viewModel = ViewModelProvider(this, factory).get(MoviesViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)[MoviesViewModel::class.java]
 
         viewModel.getPopularMovies("16d4b76831709bc650217ad5df094731").observe(viewLifecycleOwner) { movies ->
             movies?.let {

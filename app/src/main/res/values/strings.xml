@@ -2,5 +2,7 @@
     <string name="app_name">Movies</string>
 
     <string name="movie_poster">Movie Poster</string>
+    <string name="error_loading_details">Error loading details</string>
+    <string name="error_loading_details_message">error loading details</string>
 
 </resources>

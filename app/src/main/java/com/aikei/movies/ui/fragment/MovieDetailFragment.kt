@@ -5,21 +5,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.aikei.movies.MyApp
-import com.aikei.movies.databinding.FragmentMovieDetailBinding
-import com.aikei.movies.viewmodel.MovieDetailViewModel
-import com.aikei.movies.viewmodel.MoviesViewModel
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.aikei.movies.MyApp
+import com.aikei.movies.api.model.MovieDetails
+import com.aikei.movies.databinding.FragmentMovieDetailBinding
 import com.aikei.movies.repository.MoviesRepository
+import com.aikei.movies.viewmodel.MovieDetailViewModel
 
 class MovieDetailFragment : Fragment() {
     private var _binding: FragmentMovieDetailBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: MovieDetailViewModel by viewModels {
-        ViewModelFactory((activity?.application as MyApp).repository)
+        ViewModelFactory((requireActivity().application as MyApp).repository)
     }
 
     override fun onCreateView(
@@ -32,14 +32,25 @@ class MovieDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val movieId = requireArguments().getInt(ARG_MOVIE_ID)
 
         viewModel.getMovieDetails(movieId, "16d4b76831709bc650217ad5df094731").observe(viewLifecycleOwner) { movieDetails ->
-            // Assuming 'movieDetails' is not null and has 'title' and 'overview' properties
-            binding.movieTitleText.text = movieDetails?.title
-            binding.movieOverviewText.text = movieDetails?.overview
-            // If you have an ImageView for poster, you can load the image using a library like Coil
+            if (movieDetails != null) {
+                displayMovieDetails(movieDetails)
+            } else {
+                // Show error message when movie details are not found
+                binding.movieTitleText.text = "Movie details not found"
+                binding.movieOverviewText.text = "Movie overview not found"
+            }
         }
+    }
+
+    private fun displayMovieDetails(movieDetails: MovieDetails) {
+        // Display movie details when available
+        binding.movieTitleText.text = movieDetails.title
+        binding.movieOverviewText.text = movieDetails.overview
+        // You can set other views with relevant data here
     }
 
     override fun onDestroyView() {
