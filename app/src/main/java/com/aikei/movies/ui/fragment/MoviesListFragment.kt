@@ -32,11 +32,10 @@ class MoviesListFragment : Fragment() {
 
         // Initialize the adapter with an empty list and set up click listener to navigate
         moviesAdapter = MoviesAdapter(emptyList()) { movie ->
-            val action = MoviesListFragmentDirections.actionMoviesListFragmentToMovieDetailFragment(movie.id)
+            val action = MoviesListFragmentDirections.actionMoviesListFragmentToMovieDetailFragment(movieId = movie.id)
             findNavController().navigate(action)
-
-
         }
+
         setupRecyclerView()
 
         val factory = ViewModelFactory((activity?.application as MyApp).repository)
