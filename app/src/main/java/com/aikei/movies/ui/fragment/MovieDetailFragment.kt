@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import coil.load
 import com.aikei.movies.MyApp
 import com.aikei.movies.R
 import com.aikei.movies.api.model.MovieDetails
@@ -47,6 +48,12 @@ class MovieDetailFragment : Fragment() {
                 binding.movieTitleText.text = movieDetails.title
                 binding.movieOverviewText.text = movieDetails.overview
                 // Load poster image, etc.
+                val baseImageUrl: String = "https://image.tmdb.org/t/p/w500"
+                binding.moviePosterImage.load(baseImageUrl + movieDetails.posterUrl) {
+                    crossfade(true)
+                    placeholder(R.drawable.ic_placeholder)
+                    error(R.drawable.ic_error)
+                }
             } else {
                 binding.movieTitleText.text = getString(R.string.error_loading_movie_details)
                 binding.movieOverviewText.text = getString(R.string.try_again_later)

@@ -55,9 +55,7 @@ class MoviesListFragment : Fragment() {
         binding.moviesRecyclerView.adapter = moviesAdapter
     }
 
-    companion object {
-        fun newInstance(): MoviesListFragment = MoviesListFragment()
-    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

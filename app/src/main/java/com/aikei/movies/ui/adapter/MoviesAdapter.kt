@@ -14,7 +14,7 @@ class MoviesAdapter(
 ) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>() {
 
     // Optional: You can make the baseImageUrl a companion object if it doesn't change
-    private val baseImageUrl: String = "https://image.tmdb.org/t/p/w500"
+    val baseImageUrl: String = "https://image.tmdb.org/t/p/w500"
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
         val binding = ItemMovieBinding.inflate(LayoutInflater.from(parent.context), parent, false)

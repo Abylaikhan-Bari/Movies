@@ -5,12 +5,13 @@
     android:layout_margin="4dp"
     android:padding="4dp">
 
-<ImageView
-    android:id="@+id/movie_poster_image"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:scaleType="centerCrop"
-    android:adjustViewBounds="true" />
+    <ImageView
+        android:id="@+id/movie_poster_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        android:layout_gravity="center" />
 
     <TextView
         android:id="@+id/movie_title_text"

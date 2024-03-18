@@ -8,9 +8,13 @@
 
     <ImageView
         android:id="@+id/movie_poster_image"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="300dp"
+        android:scaleType="fitCenter"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintDimensionRatio="16:9"
         tools:src="@tools:sample/avatars"
         android:contentDescription="@string/movie_poster" />
 
@@ -20,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        app:layout_constraintTop_toBottomOf="@+id/movie_poster_image"
+        app:layout_constraintTop_toBottomOf="@id/movie_poster_image"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="Movie Title" />
