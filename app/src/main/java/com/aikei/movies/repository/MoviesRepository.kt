@@ -45,18 +45,13 @@ class MoviesRepository(private val moviesApiService: MoviesApiService) {
         moviesApiService.getMovieDetails(movieId, apiKey).enqueue(object : Callback<MovieDetails> {
             override fun onResponse(call: Call<MovieDetails>, response: Response<MovieDetails>) {
                 if (response.isSuccessful) {
-                    Log.d(TAG, "getMovieDetails: data fetched successfully")
                     data.postValue(response.body())
+                } else if (response.code() == 404) {
+                    Log.e(TAG, "getMovieDetails: Movie not found")
+                    data.postValue(null) // No movie found
                 } else {
                     Log.e(TAG, "getMovieDetails: error ${response.code()} ${response.message()}")
-                    if (response.code() == 404) {
-                        Log.e(TAG, "getMovieDetails: movie not found")
-                        data.postValue(null)
-                    } else {
-                        // Handle other error cases as needed
-                        Log.e(TAG, "getMovieDetails: other error occurred")
-                        data.postValue(null)
-                    }
+                    data.postValue(null)
                 }
             }
 

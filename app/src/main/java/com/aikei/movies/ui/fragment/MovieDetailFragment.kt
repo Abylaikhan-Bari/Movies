@@ -1,6 +1,7 @@
 package com.aikei.movies.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.aikei.movies.MyApp
+import com.aikei.movies.R
 import com.aikei.movies.api.model.MovieDetails
 import com.aikei.movies.databinding.FragmentMovieDetailBinding
 import com.aikei.movies.repository.MoviesRepository
@@ -32,19 +34,26 @@ class MovieDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val movieId = requireArguments().getInt("movieId")
 
-        val movieId = requireArguments().getInt(ARG_MOVIE_ID)
-
+        if (movieId <= 0) {
+            Log.e("MovieDetailFragment", "Invalid movie ID")
+            binding.movieTitleText.text = getString(R.string.error_invalid_movie_id)
+            // Update the UI to indicate the error or hide the detail view
+            return
+        }
         viewModel.getMovieDetails(movieId, "16d4b76831709bc650217ad5df094731").observe(viewLifecycleOwner) { movieDetails ->
             if (movieDetails != null) {
-                displayMovieDetails(movieDetails)
+                binding.movieTitleText.text = movieDetails.title
+                binding.movieOverviewText.text = movieDetails.overview
+                // Load poster image, etc.
             } else {
-                // Show error message when movie details are not found
-                binding.movieTitleText.text = "Movie details not found"
-                binding.movieOverviewText.text = "Movie overview not found"
+                binding.movieTitleText.text = getString(R.string.error_loading_movie_details)
+                binding.movieOverviewText.text = getString(R.string.try_again_later)
             }
         }
     }
+
 
     private fun displayMovieDetails(movieDetails: MovieDetails) {
         // Display movie details when available

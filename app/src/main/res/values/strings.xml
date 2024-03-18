@@ -2,7 +2,8 @@
     <string name="app_name">Movies</string>
 
     <string name="movie_poster">Movie Poster</string>
-    <string name="error_loading_details">Error loading details</string>
-    <string name="error_loading_details_message">error loading details</string>
+    <string name="error_loading_movie_details">Error loading movie details.</string>
+    <string name="try_again_later">Please try again later.</string>
+    <string name="error_invalid_movie_id">Invalid movie ID.</string>
 
 </resources>
