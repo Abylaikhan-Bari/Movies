@@ -1,0 +1,327 @@
+Subject: [PATCH] comments
+---
+Index: app/src/main/java/com/aikei/movies/ui/activity/MainActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/aikei/movies/ui/activity/MainActivity.kt b/app/src/main/java/com/aikei/movies/presentation/activity/MainActivity.kt
+rename from app/src/main/java/com/aikei/movies/ui/activity/MainActivity.kt
+rename to app/src/main/java/com/aikei/movies/presentation/activity/MainActivity.kt
+--- a/app/src/main/java/com/aikei/movies/ui/activity/MainActivity.kt	(revision 67a725e4468313d4107ce2e74543d9755a7d3521)
++++ b/app/src/main/java/com/aikei/movies/presentation/activity/MainActivity.kt	(date 1710796551385)
+@@ -1,4 +1,4 @@
+-package com.aikei.movies.ui.activity
++package com.aikei.movies.presentation.activity
+ 
+ import android.os.Bundle
+ import androidx.appcompat.app.AppCompatActivity
+Index: app/src/main/res/navigation/nav_graph.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/navigation/nav_graph.xml b/app/src/main/res/navigation/nav_graph.xml
+--- a/app/src/main/res/navigation/nav_graph.xml	(revision 67a725e4468313d4107ce2e74543d9755a7d3521)
++++ b/app/src/main/res/navigation/nav_graph.xml	(date 1710796551383)
+@@ -7,7 +7,7 @@
+ 
+     <fragment
+         android:id="@+id/moviesListFragment"
+-        android:name="com.aikei.movies.ui.fragment.MoviesListFragment"
++        android:name="com.aikei.movies.presentation.fragment.MoviesListFragment"
+         android:label="Movies List">
+         <action
+             android:id="@+id/action_moviesListFragment_to_movieDetailFragment"
+@@ -16,7 +16,7 @@
+ 
+     <fragment
+         android:id="@+id/movieDetailFragment"
+-        android:name="com.aikei.movies.ui.fragment.MovieDetailFragment"
++        android:name="com.aikei.movies.presentation.fragment.MovieDetailFragment"
+         android:label="Movie detail"
+         tools:layout="@layout/fragment_movie_detail">
+         <argument
+Index: app/src/main/java/com/aikei/movies/ui/adapter/MoviesAdapter.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/aikei/movies/ui/adapter/MoviesAdapter.kt b/app/src/main/java/com/aikei/movies/presentation/adapter/MoviesAdapter.kt
+rename from app/src/main/java/com/aikei/movies/ui/adapter/MoviesAdapter.kt
+rename to app/src/main/java/com/aikei/movies/presentation/adapter/MoviesAdapter.kt
+--- a/app/src/main/java/com/aikei/movies/ui/adapter/MoviesAdapter.kt	(revision 67a725e4468313d4107ce2e74543d9755a7d3521)
++++ b/app/src/main/java/com/aikei/movies/presentation/adapter/MoviesAdapter.kt	(date 1710797158455)
+@@ -1,13 +1,14 @@
+-package com.aikei.movies.ui.adapter
++package com.aikei.movies.presentation.adapter
+ 
+ import android.view.LayoutInflater
+ import android.view.ViewGroup
+ import androidx.recyclerview.widget.RecyclerView
+ import coil.load
+ import com.aikei.movies.R
+-import com.aikei.movies.api.model.Movie
++import com.aikei.movies.data.api.model.Movie
+ import com.aikei.movies.databinding.ItemMovieBinding
+ 
++// переделай под ListAdapter
+ class MoviesAdapter(
+     private var movies: List<Movie>,
+     private val onItemClick: ((Movie) -> Unit)? // Optional click listener for movie item
+@@ -49,6 +50,7 @@
+ 
+ 
+             // Invoke click listener when the item view is clicked
++            // вынеси это в onCreateViewHolder
+             itemView.setOnClickListener {
+                 onItemClick?.invoke(movie)
+             }
+Index: app/src/main/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/AndroidManifest.xml b/app/src/main/AndroidManifest.xml
+--- a/app/src/main/AndroidManifest.xml	(revision 67a725e4468313d4107ce2e74543d9755a7d3521)
++++ b/app/src/main/AndroidManifest.xml	(date 1710796551372)
+@@ -15,7 +15,7 @@
+         android:networkSecurityConfig="@xml/network_security_config"
+         android:theme="@style/Theme.Movies"
+         tools:targetApi="31">
+-        <activity android:name=".ui.activity.MainActivity"
++        <activity android:name=".presentation.activity.MainActivity"
+             android:exported="true">
+             <intent-filter>
+                 <action android:name="android.intent.action.MAIN" />
+Index: app/src/main/java/com/aikei/movies/ui/fragment/MovieDetailFragment.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/aikei/movies/ui/fragment/MovieDetailFragment.kt b/app/src/main/java/com/aikei/movies/presentation/fragment/MovieDetailFragment.kt
+rename from app/src/main/java/com/aikei/movies/ui/fragment/MovieDetailFragment.kt
+rename to app/src/main/java/com/aikei/movies/presentation/fragment/MovieDetailFragment.kt
+--- a/app/src/main/java/com/aikei/movies/ui/fragment/MovieDetailFragment.kt	(revision 67a725e4468313d4107ce2e74543d9755a7d3521)
++++ b/app/src/main/java/com/aikei/movies/presentation/fragment/MovieDetailFragment.kt	(date 1710796577052)
+@@ -1,4 +1,4 @@
+-package com.aikei.movies.ui.fragment
++package com.aikei.movies.presentation.fragment
+ 
+ import android.os.Bundle
+ import android.util.Log
+@@ -12,10 +12,10 @@
+ import coil.load
+ import com.aikei.movies.MyApp
+ import com.aikei.movies.R
+-import com.aikei.movies.api.model.MovieDetails
++import com.aikei.movies.data.api.model.MovieDetails
+ import com.aikei.movies.databinding.FragmentMovieDetailBinding
+-import com.aikei.movies.repository.MoviesRepository
+-import com.aikei.movies.viewmodel.MovieDetailViewModel
++import com.aikei.movies.data.repository.MoviesRepository
++import com.aikei.movies.presentation.viewmodel.MovieDetailViewModel
+ 
+ class MovieDetailFragment : Fragment() {
+     private var _binding: FragmentMovieDetailBinding? = null
+Index: app/src/main/java/com/aikei/movies/api/model/Movie.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/aikei/movies/api/model/Movie.kt b/app/src/main/java/com/aikei/movies/data/api/model/Movie.kt
+rename from app/src/main/java/com/aikei/movies/api/model/Movie.kt
+rename to app/src/main/java/com/aikei/movies/data/api/model/Movie.kt
+--- a/app/src/main/java/com/aikei/movies/api/model/Movie.kt	(revision 67a725e4468313d4107ce2e74543d9755a7d3521)
++++ b/app/src/main/java/com/aikei/movies/data/api/model/Movie.kt	(date 1710797158449)
+@@ -1,7 +1,10 @@
+-package com.aikei.movies.api.model
++package com.aikei.movies.data.api.model
+ 
+ import com.google.gson.annotations.SerializedName
+ 
++// теперь должна быть модель отдельная для presentation слоя
++// и мапить должны в репозитории
++// посмотри в гите на прошлых уроках примеры
+ data class Movie(
+     val id: Int,
+     val title: String,
+Index: app/src/main/java/com/aikei/movies/MyApp.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/aikei/movies/MyApp.kt b/app/src/main/java/com/aikei/movies/MyApp.kt
+--- a/app/src/main/java/com/aikei/movies/MyApp.kt	(revision 67a725e4468313d4107ce2e74543d9755a7d3521)
++++ b/app/src/main/java/com/aikei/movies/MyApp.kt	(date 1710796577055)
+@@ -1,8 +1,8 @@
+ package com.aikei.movies
+ 
+ import android.app.Application
+-import com.aikei.movies.api.service.MoviesApiService
+-import com.aikei.movies.repository.MoviesRepository
++import com.aikei.movies.data.api.service.MoviesApiService
++import com.aikei.movies.data.repository.MoviesRepository
+ import okhttp3.OkHttpClient
+ import okhttp3.logging.HttpLoggingInterceptor
+ import retrofit2.Retrofit
+Index: app/src/main/java/com/aikei/movies/ui/fragment/MoviesListFragment.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/aikei/movies/ui/fragment/MoviesListFragment.kt b/app/src/main/java/com/aikei/movies/presentation/fragment/MoviesListFragment.kt
+rename from app/src/main/java/com/aikei/movies/ui/fragment/MoviesListFragment.kt
+rename to app/src/main/java/com/aikei/movies/presentation/fragment/MoviesListFragment.kt
+--- a/app/src/main/java/com/aikei/movies/ui/fragment/MoviesListFragment.kt	(revision 67a725e4468313d4107ce2e74543d9755a7d3521)
++++ b/app/src/main/java/com/aikei/movies/presentation/fragment/MoviesListFragment.kt	(date 1710796577050)
+@@ -1,4 +1,4 @@
+-package com.aikei.movies.ui.fragment
++package com.aikei.movies.presentation.fragment
+ 
+ import android.os.Bundle
+ import android.view.LayoutInflater
+@@ -11,9 +11,9 @@
+ import androidx.recyclerview.widget.GridLayoutManager
+ import com.aikei.movies.MyApp
+ import com.aikei.movies.databinding.FragmentMoviesListBinding
+-import com.aikei.movies.repository.MoviesRepository
+-import com.aikei.movies.ui.adapter.MoviesAdapter
+-import com.aikei.movies.viewmodel.MoviesViewModel
++import com.aikei.movies.data.repository.MoviesRepository
++import com.aikei.movies.presentation.adapter.MoviesAdapter
++import com.aikei.movies.presentation.viewmodel.MoviesViewModel
+ 
+ class MoviesListFragment : Fragment() {
+ 
+Index: app/src/main/java/com/aikei/movies/api/model/MovieDetails.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/aikei/movies/api/model/MovieDetails.kt b/app/src/main/java/com/aikei/movies/data/api/model/MovieDetails.kt
+rename from app/src/main/java/com/aikei/movies/api/model/MovieDetails.kt
+rename to app/src/main/java/com/aikei/movies/data/api/model/MovieDetails.kt
+--- a/app/src/main/java/com/aikei/movies/api/model/MovieDetails.kt	(revision 67a725e4468313d4107ce2e74543d9755a7d3521)
++++ b/app/src/main/java/com/aikei/movies/data/api/model/MovieDetails.kt	(date 1710796551382)
+@@ -1,4 +1,4 @@
+-package com.aikei.movies.api.model
++package com.aikei.movies.data.api.model
+ 
+ import com.google.gson.annotations.SerializedName
+ 
+Index: app/src/main/java/com/aikei/movies/api/service/MoviesApiService.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/aikei/movies/api/service/MoviesApiService.kt b/app/src/main/java/com/aikei/movies/data/api/service/MoviesApiService.kt
+rename from app/src/main/java/com/aikei/movies/api/service/MoviesApiService.kt
+rename to app/src/main/java/com/aikei/movies/data/api/service/MoviesApiService.kt
+--- a/app/src/main/java/com/aikei/movies/api/service/MoviesApiService.kt	(revision 67a725e4468313d4107ce2e74543d9755a7d3521)
++++ b/app/src/main/java/com/aikei/movies/data/api/service/MoviesApiService.kt	(date 1710797158460)
+@@ -1,8 +1,8 @@
+-package com.aikei.movies.api.service
++package com.aikei.movies.data.api.service
+ 
+-import com.aikei.movies.api.model.Movie
+-import com.aikei.movies.api.model.MovieDetails
+-import com.aikei.movies.api.model.MovieResponse
++import com.aikei.movies.data.api.model.Movie
++import com.aikei.movies.data.api.model.MovieDetails
++import com.aikei.movies.data.api.model.MovieResponse
+ import retrofit2.Call
+ import retrofit2.http.GET
+ import retrofit2.http.Path
+@@ -11,6 +11,8 @@
+ interface MoviesApiService {
+ //    @GET("movie/popular")
+ //    fun getPopularMovies(@Query("api_key") apiKey: String): Call<List<Movie>>
++    // переделай все под suspend
++    // возвращай сразу MovieResponse без Call
+     @GET("movie/popular")
+     fun getPopularMovies(@Query("api_key") apiKey: String): Call<MovieResponse> // Note the change to MovieResponse
+ 
+Index: app/src/main/java/com/aikei/movies/viewmodel/MovieDetailViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/aikei/movies/viewmodel/MovieDetailViewModel.kt b/app/src/main/java/com/aikei/movies/presentation/viewmodel/MovieDetailViewModel.kt
+rename from app/src/main/java/com/aikei/movies/viewmodel/MovieDetailViewModel.kt
+rename to app/src/main/java/com/aikei/movies/presentation/viewmodel/MovieDetailViewModel.kt
+--- a/app/src/main/java/com/aikei/movies/viewmodel/MovieDetailViewModel.kt	(revision 67a725e4468313d4107ce2e74543d9755a7d3521)
++++ b/app/src/main/java/com/aikei/movies/presentation/viewmodel/MovieDetailViewModel.kt	(date 1710797158462)
+@@ -1,9 +1,7 @@
+-package com.aikei.movies.viewmodel
++package com.aikei.movies.presentation.viewmodel
+ 
+-import androidx.lifecycle.LiveData
+ import androidx.lifecycle.ViewModel
+-import com.aikei.movies.api.model.MovieDetails
+-import com.aikei.movies.repository.MoviesRepository
++import com.aikei.movies.data.repository.MoviesRepository
+ 
+ class MovieDetailViewModel(private val repository: MoviesRepository) : ViewModel() {
+ 
+Index: app/src/main/java/com/aikei/movies/viewmodel/MoviesViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/aikei/movies/viewmodel/MoviesViewModel.kt b/app/src/main/java/com/aikei/movies/presentation/viewmodel/MoviesViewModel.kt
+rename from app/src/main/java/com/aikei/movies/viewmodel/MoviesViewModel.kt
+rename to app/src/main/java/com/aikei/movies/presentation/viewmodel/MoviesViewModel.kt
+--- a/app/src/main/java/com/aikei/movies/viewmodel/MoviesViewModel.kt	(revision 67a725e4468313d4107ce2e74543d9755a7d3521)
++++ b/app/src/main/java/com/aikei/movies/presentation/viewmodel/MoviesViewModel.kt	(date 1710797158453)
+@@ -1,10 +1,7 @@
+-package com.aikei.movies.viewmodel
++package com.aikei.movies.presentation.viewmodel
+ 
+-import androidx.lifecycle.LiveData
+ import androidx.lifecycle.ViewModel
+-import com.aikei.movies.api.model.Movie
+-import com.aikei.movies.api.model.MovieDetails
+-import com.aikei.movies.repository.MoviesRepository
++import com.aikei.movies.data.repository.MoviesRepository
+ 
+ class MoviesViewModel(private val repository: MoviesRepository) : ViewModel() {
+ 
+Index: app/src/main/java/com/aikei/movies/repository/MoviesRepository.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/aikei/movies/repository/MoviesRepository.kt b/app/src/main/java/com/aikei/movies/data/repository/MoviesRepository.kt
+rename from app/src/main/java/com/aikei/movies/repository/MoviesRepository.kt
+rename to app/src/main/java/com/aikei/movies/data/repository/MoviesRepository.kt
+--- a/app/src/main/java/com/aikei/movies/repository/MoviesRepository.kt	(revision 67a725e4468313d4107ce2e74543d9755a7d3521)
++++ b/app/src/main/java/com/aikei/movies/data/repository/MoviesRepository.kt	(date 1710797158458)
+@@ -1,11 +1,11 @@
+-package com.aikei.movies.repository
++package com.aikei.movies.data.repository
+ 
+ import android.util.Log
+ import androidx.lifecycle.MutableLiveData
+-import com.aikei.movies.api.model.Movie
+-import com.aikei.movies.api.model.MovieDetails
+-import com.aikei.movies.api.model.MovieResponse
+-import com.aikei.movies.api.service.MoviesApiService
++import com.aikei.movies.data.api.model.Movie
++import com.aikei.movies.data.api.model.MovieDetails
++import com.aikei.movies.data.api.model.MovieResponse
++import com.aikei.movies.data.api.service.MoviesApiService
+ import retrofit2.Call
+ import retrofit2.Callback
+ import retrofit2.Response
+@@ -16,6 +16,10 @@
+         private const val TAG = "MoviesRepository"
+     }
+ 
++    // переделай под корутины здесь.
++    // посмотри как на прошлых уроках в гите было сделано
++    // LiveData должны быть во viewmodel
++    // и ниже другую функцию так же переделай
+     fun getPopularMovies(apiKey: String): MutableLiveData<List<Movie>?> {
+         val data = MutableLiveData<List<Movie>?>()
+ 

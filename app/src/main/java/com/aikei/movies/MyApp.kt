@@ -1,8 +1,8 @@
 package com.aikei.movies
 
 import android.app.Application
-import com.aikei.movies.api.service.MoviesApiService
-import com.aikei.movies.repository.MoviesRepository
+import com.aikei.movies.data.api.service.MoviesApiService
+import com.aikei.movies.data.repository.MoviesRepository
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit

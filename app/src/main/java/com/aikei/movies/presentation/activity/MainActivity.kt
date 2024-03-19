@@ -1,4 +1,4 @@
-package com.aikei.movies.ui.activity
+package com.aikei.movies.presentation.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

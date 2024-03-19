@@ -1,4 +1,4 @@
-package com.aikei.movies.ui.fragment
+package com.aikei.movies.presentation.fragment
 
 import android.os.Bundle
 import android.util.Log
@@ -12,10 +12,10 @@ import androidx.lifecycle.ViewModelProvider
 import coil.load
 import com.aikei.movies.MyApp
 import com.aikei.movies.R
-import com.aikei.movies.api.model.MovieDetails
+import com.aikei.movies.data.api.model.MovieDetails
 import com.aikei.movies.databinding.FragmentMovieDetailBinding
-import com.aikei.movies.repository.MoviesRepository
-import com.aikei.movies.viewmodel.MovieDetailViewModel
+import com.aikei.movies.data.repository.MoviesRepository
+import com.aikei.movies.presentation.viewmodel.MovieDetailViewModel
 
 class MovieDetailFragment : Fragment() {
     private var _binding: FragmentMovieDetailBinding? = null

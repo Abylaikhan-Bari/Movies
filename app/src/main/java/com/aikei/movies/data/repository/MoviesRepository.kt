@@ -1,11 +1,11 @@
-package com.aikei.movies.repository
+package com.aikei.movies.data.repository
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.aikei.movies.api.model.Movie
-import com.aikei.movies.api.model.MovieDetails
-import com.aikei.movies.api.model.MovieResponse
-import com.aikei.movies.api.service.MoviesApiService
+import com.aikei.movies.data.api.model.Movie
+import com.aikei.movies.data.api.model.MovieDetails
+import com.aikei.movies.data.api.model.MovieResponse
+import com.aikei.movies.data.api.service.MoviesApiService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -16,6 +16,10 @@ class MoviesRepository(private val moviesApiService: MoviesApiService) {
         private const val TAG = "MoviesRepository"
     }
 
+    // переделай под корутины здесь.
+    // посмотри как на прошлых уроках в гите было сделано
+    // LiveData должны быть во viewmodel
+    // и ниже другую функцию так же переделай
     fun getPopularMovies(apiKey: String): MutableLiveData<List<Movie>?> {
         val data = MutableLiveData<List<Movie>?>()
 

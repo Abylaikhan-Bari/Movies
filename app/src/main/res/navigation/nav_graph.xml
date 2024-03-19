@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/moviesListFragment"
-        android:name="com.aikei.movies.ui.fragment.MoviesListFragment"
+        android:name="com.aikei.movies.presentation.fragment.MoviesListFragment"
         android:label="Movies List">
         <action
             android:id="@+id/action_moviesListFragment_to_movieDetailFragment"
@@ -16,7 +16,7 @@
 
     <fragment
         android:id="@+id/movieDetailFragment"
-        android:name="com.aikei.movies.ui.fragment.MovieDetailFragment"
+        android:name="com.aikei.movies.presentation.fragment.MovieDetailFragment"
         android:label="Movie detail"
         tools:layout="@layout/fragment_movie_detail">
         <argument

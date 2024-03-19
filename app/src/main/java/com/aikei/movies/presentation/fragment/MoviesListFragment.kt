@@ -1,4 +1,4 @@
-package com.aikei.movies.ui.fragment
+package com.aikei.movies.presentation.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,9 +11,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.aikei.movies.MyApp
 import com.aikei.movies.databinding.FragmentMoviesListBinding
-import com.aikei.movies.repository.MoviesRepository
-import com.aikei.movies.ui.adapter.MoviesAdapter
-import com.aikei.movies.viewmodel.MoviesViewModel
+import com.aikei.movies.data.repository.MoviesRepository
+import com.aikei.movies.presentation.adapter.MoviesAdapter
+import com.aikei.movies.presentation.viewmodel.MoviesViewModel
 
 class MoviesListFragment : Fragment() {
 
@@ -31,21 +31,20 @@ class MoviesListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Initialize the adapter with an empty list and set up click listener to navigate
-        moviesAdapter = MoviesAdapter(emptyList()) { movie ->
+        moviesAdapter = MoviesAdapter { movie ->
             // Assuming you have a movie object with a valid ID
             val action = MoviesListFragmentDirections.actionMoviesListFragmentToMovieDetailFragment(movie.id)
             findNavController().navigate(action)
-
         }
 
         setupRecyclerView()
 
-        val factory = ViewModelFactory((activity?.application as MyApp).repository)
-        viewModel = ViewModelProvider(this, factory)[MoviesViewModel::class.java]
+        val factory = ViewModelFactory((requireActivity().application as MyApp).repository)
+        viewModel = ViewModelProvider(this, factory).get(MoviesViewModel::class.java)
 
         viewModel.getPopularMovies("16d4b76831709bc650217ad5df094731").observe(viewLifecycleOwner) { movies ->
             movies?.let {
-                moviesAdapter.updateMovies(it) // Update adapter's dataset
+                moviesAdapter.submitList(it) // Update adapter's dataset
             }
         }
     }
@@ -54,8 +53,6 @@ class MoviesListFragment : Fragment() {
         binding.moviesRecyclerView.layoutManager = GridLayoutManager(context, 3)
         binding.moviesRecyclerView.adapter = moviesAdapter
     }
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()
