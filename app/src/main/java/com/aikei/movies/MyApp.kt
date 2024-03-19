@@ -17,31 +17,31 @@ class MyApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        // Setup logging interceptor for OkHttpClient
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
+        // Initialize OkHttpClient
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(logging)
             .build()
 
+        // Initialize Retrofit
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.themoviedb.org/3/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
+        // Create an instance of MoviesApiService
         val moviesApiService = retrofit.create(MoviesApiService::class.java)
-        val db = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java, "favorite_movies"
-        ).build()
-        // Initialize Room Database
+
+        // Initialize Room Database using the singleton pattern
         val database = AppDatabase.getDatabase(this)
         val moviesDao = database.moviesDao()
 
-        // Now, include the MoviesDao in the MoviesRepository initialization
+        // Initialize MoviesRepository with the MoviesApiService and MoviesDao
         repository = MoviesRepository(moviesApiService, moviesDao)
     }
 }
-

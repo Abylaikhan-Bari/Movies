@@ -5,12 +5,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
+import com.aikei.movies.MyApp
 import com.aikei.movies.R
+import com.aikei.movies.presentation.adapter.FavoritesAdapter
+import com.aikei.movies.presentation.viewmodel.FavoritesViewModel
+import com.aikei.movies.presentation.viewmodel.ViewModelFactory
 
 class FavoritesFragment : Fragment() {
-
-    // If you're using View Binding, declare your binding variable here
+    private val viewModel: FavoritesViewModel by viewModels {
+        ViewModelFactory((requireActivity().application as MyApp).repository)
+    }
+    private lateinit var favoritesAdapter: FavoritesAdapter // Assuming this is your adapter class
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -19,12 +27,16 @@ class FavoritesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // If using View Binding, initialize it here
 
-        // Setup RecyclerView
+        // Setup RecyclerView and adapter
         val recyclerView: RecyclerView = view.findViewById(R.id.favoritesRecyclerView)
-        // Assuming you have a FavoritesAdapter for your RecyclerView, initialize and set it here
-    }
+        favoritesAdapter = FavoritesAdapter() // Initialize your adapter
+        recyclerView.adapter = favoritesAdapter
 
-    // If using View Binding, remember to nullify the binding variable to avoid memory leaks
+        // Observe favorite movies
+        viewModel.favoriteMovies.observe(viewLifecycleOwner) { favoriteMovies ->
+            // Ensure your adapter can handle the list of movies
+            favoritesAdapter.submitList(favoriteMovies)
+        }
+    }
 }

@@ -12,7 +12,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun moviesDao(): MoviesDao
 
     companion object {
-        // Singleton prevents multiple instances of the database opening at the same time.
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -21,10 +20,10 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "movies_database"
+                    "favorite_movies"
                 ).build()
                 INSTANCE = instance
-                // Return instance
+                // Return the created database instance
                 instance
             }
         }

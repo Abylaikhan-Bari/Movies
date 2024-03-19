@@ -2,9 +2,11 @@ package com.aikei.movies.presentation.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.aikei.movies.data.db.dao.MoviesDao
+import com.aikei.movies.data.db.entities.FavoriteMovie
 import com.aikei.movies.data.repository.MoviesRepository
 import kotlinx.coroutines.launch
 
@@ -23,11 +25,24 @@ class FavoritesViewModel(private val repository: MoviesRepository) : ViewModel()
         }
     }
 
+    // Update or add this function in FavoritesViewModel
+    val favoriteMovies: LiveData<List<FavoriteMovie>> = repository.getFavoriteMovies()
+
 
     // Method to remove a movie from favorites
     fun removeFavorite(movieId: Int) {
         viewModelScope.launch {
             repository.removeFavorite(movieId)
         }
+    }
+}
+
+class ViewModelFactory(private val repository: MoviesRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(FavoritesViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return FavoritesViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

@@ -1,5 +1,6 @@
 package com.aikei.movies.data.db.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -16,6 +17,10 @@ interface MoviesDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM favorite_movies WHERE movieId = :movieId LIMIT 1)")
     suspend fun isFavorite(movieId: Int): Boolean
+
+    @Query("SELECT * FROM favorite_movies")
+    fun getFavoriteMovies(): LiveData<List<FavoriteMovie>>
+
 }
 
 

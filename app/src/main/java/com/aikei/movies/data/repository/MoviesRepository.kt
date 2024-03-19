@@ -1,6 +1,7 @@
 package com.aikei.movies.data.repository
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import com.aikei.movies.data.api.model.Genre
 import com.aikei.movies.data.api.model.Movie
 import com.aikei.movies.data.api.model.MovieDetails
@@ -71,6 +72,10 @@ class MoviesRepository(private val moviesApiService: MoviesApiService,
 
     suspend fun isFavorite(movieId: Int): Boolean {
         return moviesDao.isFavorite(movieId)
+    }
+
+    fun getFavoriteMovies(): LiveData<List<FavoriteMovie>> {
+        return moviesDao.getFavoriteMovies() // Ensure this method exists in MoviesDao
     }
 
     // Extension function to map MovieResponse to List<PresentationMovie>
