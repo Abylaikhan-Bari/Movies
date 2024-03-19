@@ -3,10 +3,13 @@ package com.aikei.movies.data.db.entities
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity(tableName = "favorite_movies")
 data class FavoriteMovie(
-    @PrimaryKey val id: Int,
+    @PrimaryKey val movieId: Int,
     val title: String,
     val posterPath: String,
-    // Include other fields you may need for your UI
+    val releaseDate: String,
+    val rating: Double
 )
+
+

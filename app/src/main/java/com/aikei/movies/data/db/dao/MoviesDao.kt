@@ -8,20 +8,15 @@ import com.aikei.movies.data.db.entities.FavoriteMovie
 
 @Dao
 interface MoviesDao {
-
-    // Insert a new favorite movie into the database. If the movie already exists, replace it.
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertFavorite(movie: FavoriteMovie)
+    suspend fun insertFavorite(favoriteMovie: FavoriteMovie)
 
-    // Retrieve all favorite movies from the database.
-    @Query("SELECT * FROM FavoriteMovie")
-    suspend fun getAllFavorites(): List<FavoriteMovie>
-
-    // Retrieve a favorite movie by its ID.
-    @Query("SELECT * FROM FavoriteMovie WHERE id = :movieId")
-    suspend fun getFavoriteById(movieId: Int): FavoriteMovie?
-
-    // Delete a favorite movie from the database by its ID.
-    @Query("DELETE FROM FavoriteMovie WHERE id = :movieId")
+    @Query("DELETE FROM favorite_movies WHERE movieId = :movieId")
     suspend fun deleteFavoriteById(movieId: Int)
+
+    @Query("SELECT EXISTS(SELECT 1 FROM favorite_movies WHERE movieId = :movieId LIMIT 1)")
+    suspend fun isFavorite(movieId: Int): Boolean
 }
+
+
+
