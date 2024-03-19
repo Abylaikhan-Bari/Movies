@@ -1,5 +1,7 @@
 package com.aikei.movies.presentation.adapter
 
+import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +11,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aikei.movies.R
 import com.aikei.movies.data.db.entities.FavoriteMovie
 import com.bumptech.glide.Glide
-
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 class FavoritesAdapter : RecyclerView.Adapter<FavoritesAdapter.FavoriteViewHolder>() {
 
     private var movies: List<FavoriteMovie> = emptyList()
@@ -36,11 +41,40 @@ class FavoritesAdapter : RecyclerView.Adapter<FavoritesAdapter.FavoriteViewHolde
         private val movieNameTextView: TextView = view.findViewById(R.id.movieNameTextView)
 
         fun bind(movie: FavoriteMovie) {
+            val baseUrl = "https://image.tmdb.org/t/p/w500" // Example base URL
+            val fullPath = baseUrl + movie.posterPath
+
             Glide.with(itemView.context)
-                .load(movie.posterPath) // Use posterPath for the image URL
+                .load(fullPath)
+                .placeholder(R.drawable.ic_placeholder)
+                .error(R.drawable.ic_error)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        Log.e("GlideLoadFailed", "Error loading image", e)
+                        return false // Important to return false so the error placeholder can be placed
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        return false
+                    }
+                })
                 .into(movieImageView)
-            movieNameTextView.text = movie.title // Use title for the movie's name
+
+
+            movieNameTextView.text = movie.title
         }
+
     }
 
 }
