@@ -23,8 +23,6 @@ import com.aikei.movies.data.repository.MoviesRepository
 import com.aikei.movies.presentation.model.PresentationMovie
 import com.aikei.movies.presentation.viewmodel.FavoritesViewModel
 import com.aikei.movies.presentation.viewmodel.MovieDetailViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class MovieDetailFragment : Fragment() {
@@ -110,7 +108,7 @@ class MovieDetailFragment : Fragment() {
     }
 
     private fun updateFavoriteStatus(menu: Menu) {
-        movieId?.let { id ->
+        movieId.let { id ->
             favoritesViewModel.isMovieFavorite(id).observe(viewLifecycleOwner) { isFavorite ->
                 val favoriteIcon = if (isFavorite) {
                     ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_filled)

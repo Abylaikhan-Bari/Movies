@@ -9,5 +9,6 @@
     <string name="movies_list">Movies</string>
     <string name="favorites">Favorites</string>
     <string name="action_favorite">Favorite</string>
+    <string name="movie_image">Movie image</string>
 
 </resources>

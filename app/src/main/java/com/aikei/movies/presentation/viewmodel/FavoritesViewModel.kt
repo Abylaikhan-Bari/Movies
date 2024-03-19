@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.aikei.movies.data.db.dao.MoviesDao
 import com.aikei.movies.data.db.entities.FavoriteMovie
 import com.aikei.movies.data.repository.MoviesRepository
 import kotlinx.coroutines.launch
