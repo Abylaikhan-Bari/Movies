@@ -1,14 +1,12 @@
 package com.aikei.movies.data.repository
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import com.aikei.movies.data.api.model.Movie
 import com.aikei.movies.data.api.model.MovieDetails
 import com.aikei.movies.data.api.model.MovieResponse
 import com.aikei.movies.data.api.service.MoviesApiService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.aikei.movies.presentation.model.PresentationMovie
+import retrofit2.HttpException
 
 class MoviesRepository(private val moviesApiService: MoviesApiService) {
 
@@ -16,58 +14,57 @@ class MoviesRepository(private val moviesApiService: MoviesApiService) {
         private const val TAG = "MoviesRepository"
     }
 
-    // переделай под корутины здесь.
-    // посмотри как на прошлых уроках в гите было сделано
-    // LiveData должны быть во viewmodel
-    // и ниже другую функцию так же переделай
-    fun getPopularMovies(apiKey: String): MutableLiveData<List<Movie>?> {
-        val data = MutableLiveData<List<Movie>?>()
-
-        moviesApiService.getPopularMovies(apiKey).enqueue(object : Callback<MovieResponse> {
-            override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
-                if (response.isSuccessful) {
-                    // Note the change to get the list of movies from the response
-                    data.postValue(response.body()?.results)
-                } else {
-                    Log.e(TAG, "getPopularMovies: error ${response.code()} ${response.message()}")
-                    data.postValue(null)
-                }
-            }
-
-            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                Log.e(TAG, "getPopularMovies: onFailure", t)
-                data.postValue(null)
-            }
-        })
-
-        return data
+    suspend fun getPopularMovies(apiKey: String): List<Movie>? {
+        return try {
+            val response = moviesApiService.getPopularMovies(apiKey)
+            response.results
+        } catch (e: HttpException) {
+            Log.e(TAG, "getPopularMovies: HTTP exception", e)
+            null
+        } catch (e: Throwable) {
+            Log.e(TAG, "getPopularMovies: Error", e)
+            null
+        }
     }
 
-    fun getMovieDetails(movieId: Int, apiKey: String): MutableLiveData<MovieDetails?> {
-        val data = MutableLiveData<MovieDetails?>()
-
-        moviesApiService.getMovieDetails(movieId, apiKey).enqueue(object : Callback<MovieDetails> {
-            override fun onResponse(call: Call<MovieDetails>, response: Response<MovieDetails>) {
-                if (response.isSuccessful) {
-                    data.postValue(response.body())
-                } else if (response.code() == 404) {
-                    Log.e(TAG, "getMovieDetails: Movie not found")
-                    data.postValue(null) // No movie found
-                } else {
-                    Log.e(TAG, "getMovieDetails: error ${response.code()} ${response.message()}")
-                    data.postValue(null)
-                }
-            }
-
-            override fun onFailure(call: Call<MovieDetails>, t: Throwable) {
-                Log.e(TAG, "getMovieDetails: onFailure", t)
-                data.postValue(null)
-            }
-        })
-
-        return data
+    suspend fun getMovieDetails(movieId: Int, apiKey: String): PresentationMovie? {
+        return try {
+            val movieDetails = moviesApiService.getMovieDetails(movieId, apiKey)
+            movieDetails.mapToPresentation()
+        } catch (e: HttpException) {
+            Log.e(TAG, "getMovieDetails: HTTP exception", e)
+            null
+        } catch (e: Throwable) {
+            Log.e(TAG, "getMovieDetails: Error", e)
+            null
+        }
     }
 
+    // Extension function to map MovieResponse to List<PresentationMovie>
+    private fun MovieResponse?.mapToPresentation(): List<PresentationMovie>? {
+        return this?.results?.map { movie ->
+            PresentationMovie(
+                id = movie.id,
+                title = movie.title,
+                posterUrl = movie.posterUrl,
+                overview = movie.overview,
+                releaseDate = movie.release_date,
+                voteAverage = movie.vote_average
+            )
+        }
+    }
 
-
+    // Extension function to map MovieDetails to PresentationMovie
+    private fun MovieDetails?.mapToPresentation(): PresentationMovie? {
+        return this?.let { movieDetails ->
+            PresentationMovie(
+                id = movieDetails.id,
+                title = movieDetails.title,
+                posterUrl = movieDetails.posterUrl,
+                overview = movieDetails.overview,
+                releaseDate = movieDetails.release_date,
+                voteAverage = movieDetails.vote_average
+            )
+        }
+    }
 }

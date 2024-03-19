@@ -16,6 +16,9 @@ import com.aikei.movies.data.api.model.MovieDetails
 import com.aikei.movies.databinding.FragmentMovieDetailBinding
 import com.aikei.movies.data.repository.MoviesRepository
 import com.aikei.movies.presentation.viewmodel.MovieDetailViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class MovieDetailFragment : Fragment() {
     private var _binding: FragmentMovieDetailBinding? = null
@@ -43,7 +46,9 @@ class MovieDetailFragment : Fragment() {
             // Update the UI to indicate the error or hide the detail view
             return
         }
-        viewModel.getMovieDetails(movieId, "16d4b76831709bc650217ad5df094731").observe(viewLifecycleOwner) { movieDetails ->
+
+        GlobalScope.launch(Dispatchers.Main) {
+            val movieDetails = viewModel.getMovieDetails(movieId, "16d4b76831709bc650217ad5df094731")
             if (movieDetails != null) {
                 binding.movieTitleText.text = movieDetails.title
                 binding.movieOverviewText.text = movieDetails.overview
