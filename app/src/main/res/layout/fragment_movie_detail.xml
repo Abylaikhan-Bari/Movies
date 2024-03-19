@@ -51,4 +51,28 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="Movie Overview Text" />
 
+    <!-- New TextView for Movie Genres -->
+    <TextView
+        android:id="@+id/movie_genres_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintTop_toBottomOf="@id/movie_overview_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="Genres" />
+
+    <!-- New TextView for Movie Runtime -->
+    <TextView
+        android:id="@+id/movie_runtime_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintTop_toBottomOf="@id/movie_genres_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="Runtime" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,5 +5,6 @@
     <string name="error_loading_movie_details">Error loading movie details.</string>
     <string name="try_again_later">Please try again later.</string>
     <string name="error_invalid_movie_id">Invalid movie ID.</string>
+    <string name="runtime_format">Runtime: %1$d mins</string>
 
 </resources>

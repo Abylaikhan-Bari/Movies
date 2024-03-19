@@ -15,6 +15,7 @@ import com.aikei.movies.R
 import com.aikei.movies.data.api.model.MovieDetails
 import com.aikei.movies.databinding.FragmentMovieDetailBinding
 import com.aikei.movies.data.repository.MoviesRepository
+import com.aikei.movies.presentation.model.PresentationMovie
 import com.aikei.movies.presentation.viewmodel.MovieDetailViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -40,38 +41,42 @@ class MovieDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val movieId = requireArguments().getInt("movieId")
 
-        if (movieId <= 0) {
-            Log.e("MovieDetailFragment", "Invalid movie ID")
-            binding.movieTitleText.text = getString(R.string.error_invalid_movie_id)
-            // Update the UI to indicate the error or hide the detail view
-            return
-        }
-
         GlobalScope.launch(Dispatchers.Main) {
-            val movieDetails = viewModel.getMovieDetails(movieId, "16d4b76831709bc650217ad5df094731")
-            if (movieDetails != null) {
-                binding.movieTitleText.text = movieDetails.title
-                binding.movieOverviewText.text = movieDetails.overview
-                // Load poster image, etc.
-                val baseImageUrl: String = "https://image.tmdb.org/t/p/w500"
-                binding.moviePosterImage.load(baseImageUrl + movieDetails.posterUrl) {
-                    crossfade(true)
-                    placeholder(R.drawable.ic_placeholder)
-                    error(R.drawable.ic_error)
-                }
+            val presentationMovie = viewModel.getMovieDetails(movieId, "16d4b76831709bc650217ad5df094731")
+            if (presentationMovie != null) {
+                val movieDetails = convertToMovieDetails(presentationMovie)
+                displayMovieDetails(movieDetails)
             } else {
                 binding.movieTitleText.text = getString(R.string.error_loading_movie_details)
-                binding.movieOverviewText.text = getString(R.string.try_again_later)
             }
         }
+
+    }
+    fun convertToMovieDetails(presentationMovie: PresentationMovie): MovieDetails {
+        return MovieDetails(
+            id = presentationMovie.id,
+            title = presentationMovie.title,
+            overview = presentationMovie.overview,
+            posterUrl = presentationMovie.posterUrl,
+            release_date = presentationMovie.releaseDate,
+            vote_average = presentationMovie.voteAverage,
+            genres = presentationMovie.genres,
+            runtime = presentationMovie.runtime
+        )
     }
 
-
     private fun displayMovieDetails(movieDetails: MovieDetails) {
-        // Display movie details when available
         binding.movieTitleText.text = movieDetails.title
         binding.movieOverviewText.text = movieDetails.overview
-        // You can set other views with relevant data here
+        val genresText = movieDetails.genres.joinToString(separator = ", ") { it.name }
+        binding.movieGenresText.text = genresText
+        binding.movieRuntimeText.text = getString(R.string.runtime_format, movieDetails.runtime)
+        val baseImageUrl: String = "https://image.tmdb.org/t/p/w500"
+        binding.moviePosterImage.load(baseImageUrl + movieDetails.posterUrl) {
+            crossfade(true)
+            placeholder(R.drawable.ic_placeholder)
+            error(R.drawable.ic_error)
+        }
     }
 
     override fun onDestroyView() {
@@ -80,11 +85,9 @@ class MovieDetailFragment : Fragment() {
     }
 
     companion object {
-        private const val ARG_MOVIE_ID = "movie_id"
-
         fun newInstance(movieId: Int): MovieDetailFragment = MovieDetailFragment().apply {
             arguments = Bundle().apply {
-                putInt(ARG_MOVIE_ID, movieId)
+                putInt("movieId", movieId)
             }
         }
     }

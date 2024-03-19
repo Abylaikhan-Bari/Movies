@@ -1,6 +1,7 @@
 package com.aikei.movies.data.repository
 
 import android.util.Log
+import com.aikei.movies.data.api.model.Genre
 import com.aikei.movies.data.api.model.Movie
 import com.aikei.movies.data.api.model.MovieDetails
 import com.aikei.movies.data.api.model.MovieResponse
@@ -49,10 +50,13 @@ class MoviesRepository(private val moviesApiService: MoviesApiService) {
                 posterUrl = movie.posterUrl,
                 overview = movie.overview,
                 releaseDate = movie.release_date,
-                voteAverage = movie.vote_average
+                voteAverage = movie.vote_average,
+                genres = emptyList(), // Assuming no genre information is available here
+                runtime = 0 // Assuming no runtime information is available here
             )
         }
     }
+
 
     // Extension function to map MovieDetails to PresentationMovie
     private fun MovieDetails?.mapToPresentation(): PresentationMovie? {
@@ -63,8 +67,11 @@ class MoviesRepository(private val moviesApiService: MoviesApiService) {
                 posterUrl = movieDetails.posterUrl,
                 overview = movieDetails.overview,
                 releaseDate = movieDetails.release_date,
-                voteAverage = movieDetails.vote_average
+                voteAverage = movieDetails.vote_average,
+                genres = movieDetails.genres.map { genre -> Genre(genre.id, genre.name) }, // Convert each Genre to your Presentation Genre
+                runtime = movieDetails.runtime
             )
         }
     }
+
 }
