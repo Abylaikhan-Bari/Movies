@@ -80,10 +80,14 @@ class MoviesListFragment : Fragment() {
     }
 
     private fun showMovies(movies: List<Movie>) {
-        binding.moviesRecyclerView.visibility = View.VISIBLE
-        binding.emptyStateTextView.visibility = View.GONE
-        moviesAdapter.submitList(movies)
-        Log.d("MoviesListFragment", "Number of movies: ${movies.size}")
+        if (movies.isNotEmpty()) {
+            binding.moviesRecyclerView.visibility = View.VISIBLE
+            binding.emptyStateTextView.visibility = View.GONE
+            moviesAdapter.submitList(movies)
+            Log.d("MoviesListFragment", "Number of movies: ${movies.size}")
+        } else {
+            showEmptyState()
+        }
     }
 
     private fun showEmptyState() {
@@ -91,6 +95,7 @@ class MoviesListFragment : Fragment() {
         binding.emptyStateTextView.visibility = View.VISIBLE
         Log.d("MoviesListFragment", "Movie list is empty")
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
