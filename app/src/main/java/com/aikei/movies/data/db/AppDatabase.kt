@@ -6,8 +6,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.aikei.movies.data.db.dao.MoviesDao
 import com.aikei.movies.data.db.entities.FavoriteMovie
+import com.aikei.movies.data.db.entities.PopularMovie
 
-@Database(entities = [FavoriteMovie::class], version = 1, exportSchema = false)
+@Database(entities = [FavoriteMovie::class, PopularMovie::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun moviesDao(): MoviesDao
 
@@ -20,10 +21,9 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "favorite_movies"
+                    "movies_database" // Changed to a more general name
                 ).build()
                 INSTANCE = instance
-                // Return the created database instance
                 instance
             }
         }

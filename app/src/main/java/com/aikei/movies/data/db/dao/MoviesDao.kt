@@ -1,14 +1,13 @@
 package com.aikei.movies.data.db.dao
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.aikei.movies.data.db.entities.FavoriteMovie
+import com.aikei.movies.data.db.entities.PopularMovie
 
 @Dao
 interface MoviesDao {
+    // Favorite Movies
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFavorite(favoriteMovie: FavoriteMovie)
 
@@ -21,7 +20,13 @@ interface MoviesDao {
     @Query("SELECT * FROM favorite_movies")
     fun getFavoriteMovies(): LiveData<List<FavoriteMovie>>
 
+    // Popular Movies
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllPopularMovies(popularMovies: List<PopularMovie>)
+
+    @Query("DELETE FROM popular_movies")
+    suspend fun deleteAllPopularMovies()
+
+    @Query("SELECT * FROM popular_movies")
+    fun getAllPopularMovies(): LiveData<List<PopularMovie>>
 }
-
-
-
