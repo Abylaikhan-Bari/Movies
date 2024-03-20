@@ -13,6 +13,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
+    private lateinit var bottomNavigationView: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,21 +26,31 @@ class MainActivity : AppCompatActivity() {
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
-        // Define AppBarConfiguration
         val appBarConfiguration = AppBarConfiguration(
-            // Here you can add the top-level destinations where the back arrow shouldn't be shown
             setOf(R.id.moviesListFragment, R.id.favoritesFragment)
         )
 
-        // Setup ActionBar with NavController and AppBarConfiguration
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-        val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        bottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigationView.setupWithNavController(navController)
+
+        // Observe the NavController to update BottomNavigationView's selected item
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            bottomNavigationView.menu.findItem(destination.id)?.isChecked = true
+            when (destination.id) {
+                R.id.movieDetailFragment -> {
+                    // Set MoviesListFragment as the selected item when in MovieDetailFragment
+                    bottomNavigationView.menu.findItem(R.id.moviesListFragment)?.isChecked = true
+                }
+            }
+        }
+
+        // Prevent reselection of the current item
+        bottomNavigationView.setOnItemReselectedListener { /* No-op */ }
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        // Pass the AppBarConfiguration to support navigate up
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }
