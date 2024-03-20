@@ -29,4 +29,13 @@ interface MoviesDao {
 
     @Query("SELECT * FROM popular_movies")
     fun getAllPopularMovies(): LiveData<List<PopularMovie>>
+
+    // Additional method with needToRefresh parameter
+    @Transaction
+    suspend fun insertOrUpdatePopularMovies(popularMovies: List<PopularMovie>, needToRefresh: Boolean) {
+        if (needToRefresh || getAllPopularMovies().value.isNullOrEmpty()) {
+            deleteAllPopularMovies()
+            insertAllPopularMovies(popularMovies)
+        }
+    }
 }

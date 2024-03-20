@@ -1,6 +1,7 @@
 package com.aikei.movies.presentation.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.aikei.movies.MyApp
 import com.aikei.movies.databinding.FragmentMoviesListBinding
+import com.aikei.movies.data.db.entities.PopularMovie
 import com.aikei.movies.data.repository.MoviesRepository
 import com.aikei.movies.presentation.adapter.MoviesAdapter
 import com.aikei.movies.presentation.viewmodel.MoviesViewModel
@@ -42,10 +44,32 @@ class MoviesListFragment : Fragment() {
         val factory = ViewModelFactory((requireActivity().application as MyApp).repository)
         viewModel = ViewModelProvider(this, factory).get(MoviesViewModel::class.java)
 
-        viewModel.getPopularMovies("16d4b76831709bc650217ad5df094731").observe(viewLifecycleOwner) { movies ->
+        // Initially fetch popular movies without refreshing
+        viewModel.getPopularMovies(needToRefresh = false, apiKey = "16d4b76831709bc650217ad5df094731").observe(viewLifecycleOwner) { movies ->
             movies?.let {
-                moviesAdapter.submitList(it) // Update adapter's dataset
+                if (it.isNotEmpty()) {
+                    moviesAdapter.submitList(it)
+                    moviesAdapter.notifyDataSetChanged() // Notify RecyclerView of dataset change
+                } else {
+                    // Log a message or show a placeholder if the dataset is empty
+                    Log.d("MoviesListFragment", "Movie list is empty")
+                }
+            } ?: run {
+                // Log a message or handle null dataset case
+                Log.d("MoviesListFragment", "Movie list is null")
             }
+        }
+
+        // Set up SwipeRefreshLayout
+        val swipeRefreshLayout = binding.swipeRefreshLayout
+        swipeRefreshLayout.setOnRefreshListener {
+            viewModel.getPopularMovies(needToRefresh = true, apiKey = "16d4b76831709bc650217ad5df094731")
+                .observe(viewLifecycleOwner) { movies ->
+                    movies?.let {
+                        moviesAdapter.submitList(it) // Update adapter's dataset
+                    }
+                    swipeRefreshLayout.isRefreshing = false // Stop the refreshing animation
+                }
         }
     }
 

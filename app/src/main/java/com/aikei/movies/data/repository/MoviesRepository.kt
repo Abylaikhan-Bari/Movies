@@ -9,29 +9,40 @@ import com.aikei.movies.data.api.model.MovieResponse
 import com.aikei.movies.data.api.service.MoviesApiService
 import com.aikei.movies.data.db.dao.MoviesDao
 import com.aikei.movies.data.db.entities.FavoriteMovie
+import com.aikei.movies.data.db.entities.PopularMovie
 import com.aikei.movies.presentation.model.PresentationMovie
 import retrofit2.HttpException
 
-class MoviesRepository(private val moviesApiService: MoviesApiService,
-                       private val moviesDao: MoviesDao
+class MoviesRepository(
+    private val moviesApiService: MoviesApiService,
+    private val moviesDao: MoviesDao
 ) {
 
     companion object {
         private const val TAG = "MoviesRepository"
     }
 
-    suspend fun getPopularMovies(apiKey: String): List<Movie>? {
-        return try {
-            val response = moviesApiService.getPopularMovies(apiKey)
-            response.results
-        } catch (e: HttpException) {
-            Log.e(TAG, "getPopularMovies: HTTP exception", e)
-            null
-        } catch (e: Throwable) {
-            Log.e(TAG, "getPopularMovies: Error", e)
-            null
+    suspend fun getPopularMovies(needToRefresh: Boolean, apiKey: String): List<PopularMovie> {
+        if (needToRefresh || moviesDao.getAllPopularMovies().value.isNullOrEmpty()) {
+            val movieResponse = moviesApiService.getPopularMovies(apiKey)
+            val popularMovies = movieResponse.results.map { it.toPopularMovie() }
+            popularMovies.let { moviesDao.insertOrUpdatePopularMovies(it, needToRefresh) }
         }
+        return moviesDao.getAllPopularMovies().value ?: emptyList()
     }
+
+    private fun Movie.toPopularMovie(): PopularMovie {
+        return PopularMovie(
+            id = id,
+            title = title,
+            posterPath = posterUrl,
+            releaseDate = release_date,
+            rating = vote_average
+        )
+    }
+
+
+
 
     suspend fun getMovieDetails(movieId: Int, apiKey: String): PresentationMovie? {
         return try {
@@ -64,8 +75,6 @@ class MoviesRepository(private val moviesApiService: MoviesApiService,
         moviesDao.insertFavorite(favoriteMovie)
     }
 
-
-
     suspend fun removeFavorite(movieId: Int) {
         moviesDao.deleteFavoriteById(movieId)
     }
@@ -75,7 +84,7 @@ class MoviesRepository(private val moviesApiService: MoviesApiService,
     }
 
     fun getFavoriteMovies(): LiveData<List<FavoriteMovie>> {
-        return moviesDao.getFavoriteMovies() // Ensure this method exists in MoviesDao
+        return moviesDao.getFavoriteMovies()
     }
 
     // Extension function to map MovieResponse to List<PresentationMovie>
@@ -94,7 +103,6 @@ class MoviesRepository(private val moviesApiService: MoviesApiService,
         }
     }
 
-
     // Extension function to map MovieDetails to PresentationMovie
     private fun MovieDetails?.mapToPresentation(): PresentationMovie? {
         return this?.let { movieDetails ->
@@ -110,5 +118,4 @@ class MoviesRepository(private val moviesApiService: MoviesApiService,
             )
         }
     }
-
 }
