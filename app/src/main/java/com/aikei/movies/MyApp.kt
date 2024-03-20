@@ -36,12 +36,11 @@ class MyApp : Application() {
 
         // Create an instance of MoviesApiService
         val moviesApiService = retrofit.create(MoviesApiService::class.java)
-
         // Initialize Room Database using the singleton pattern
         val database = AppDatabase.getDatabase(this)
         val moviesDao = database.moviesDao()
 
         // Initialize MoviesRepository with the MoviesApiService and MoviesDao
-        repository = MoviesRepository(moviesApiService, moviesDao)
+        repository = MoviesRepository(moviesApiService, moviesDao, database)
     }
 }

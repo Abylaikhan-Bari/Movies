@@ -10,5 +10,6 @@
     <string name="favorites">Favorites</string>
     <string name="action_favorite">Favorite</string>
     <string name="movie_image">Movie image</string>
+    <string name="no_movies_available">No movies available</string>
 
 </resources>

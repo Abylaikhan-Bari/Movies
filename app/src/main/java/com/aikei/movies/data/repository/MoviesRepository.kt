@@ -7,6 +7,7 @@ import com.aikei.movies.data.api.model.Movie
 import com.aikei.movies.data.api.model.MovieDetails
 import com.aikei.movies.data.api.model.MovieResponse
 import com.aikei.movies.data.api.service.MoviesApiService
+import com.aikei.movies.data.db.AppDatabase
 import com.aikei.movies.data.db.dao.MoviesDao
 import com.aikei.movies.data.db.entities.FavoriteMovie
 import com.aikei.movies.data.db.entities.PopularMovie
@@ -15,7 +16,8 @@ import retrofit2.HttpException
 
 class MoviesRepository(
     private val moviesApiService: MoviesApiService,
-    private val moviesDao: MoviesDao
+    private val moviesDao: MoviesDao,
+    private val appDatabase: AppDatabase
 ) {
 
     companion object {
@@ -23,12 +25,19 @@ class MoviesRepository(
     }
 
     suspend fun getPopularMovies(needToRefresh: Boolean, apiKey: String): List<PopularMovie> {
-        if (needToRefresh || moviesDao.getAllPopularMovies().value.isNullOrEmpty()) {
-            val movieResponse = moviesApiService.getPopularMovies(apiKey)
-            val popularMovies = movieResponse.results.map { it.toPopularMovie() }
-            popularMovies.let { moviesDao.insertOrUpdatePopularMovies(it, needToRefresh) }
+        if (needToRefresh) {
+            try {
+                val response = moviesApiService.getPopularMovies(apiKey)
+                val popularMovies = response.results.map { movieResponse ->
+                    movieResponse.toPopularMovie()
+                }
+                appDatabase.moviesDao().insertAllPopularMovies(popularMovies)
+            } catch (e: Exception) {
+                Log.e(TAG, "getPopularMovies: Error fetching popular movies", e)
+            }
         }
-        return moviesDao.getAllPopularMovies().value ?: emptyList()
+        // Observe the LiveData to get the list of PopularMovie
+        return appDatabase.moviesDao().getAllPopularMovies().value ?: emptyList()
     }
 
     private fun Movie.toPopularMovie(): PopularMovie {
@@ -36,8 +45,9 @@ class MoviesRepository(
             id = id,
             title = title,
             posterPath = posterUrl,
-            releaseDate = release_date,
-            rating = vote_average
+            releaseDate = releaseDate ?: "", // Handle null releaseDate
+            rating = rating,
+            overview = overview
         )
     }
 
@@ -95,8 +105,8 @@ class MoviesRepository(
                 title = movie.title,
                 posterUrl = movie.posterUrl,
                 overview = movie.overview,
-                releaseDate = movie.release_date,
-                voteAverage = movie.vote_average,
+                releaseDate = movie.releaseDate,
+                voteAverage = movie.rating,
                 genres = emptyList(), // Assuming no genre information is available here
                 runtime = 0 // Assuming no runtime information is available here
             )
