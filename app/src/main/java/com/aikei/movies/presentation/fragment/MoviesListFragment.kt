@@ -15,14 +15,16 @@ import com.aikei.movies.databinding.FragmentMoviesListBinding
 import com.aikei.movies.data.repository.MoviesRepository
 import com.aikei.movies.presentation.adapter.MoviesAdapter
 import com.aikei.movies.presentation.viewmodel.MoviesViewModel
+import com.aikei.movies.util.NetworkHelper
 
 class MoviesListFragment : Fragment() {
 
     private var _binding: FragmentMoviesListBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MoviesViewModel by viewModels {
-        ViewModelFactory((requireActivity().application as MyApp).repository)
+        ViewModelFactory((requireActivity().application as MyApp).repository, NetworkHelper(requireContext()))
     }
+
     private lateinit var moviesAdapter: MoviesAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -59,13 +61,14 @@ class MoviesListFragment : Fragment() {
         _binding = null
     }
 
-    class ViewModelFactory(private val repository: MoviesRepository) : ViewModelProvider.Factory {
+    class ViewModelFactory(private val repository: MoviesRepository, private val networkHelper: NetworkHelper) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(MoviesViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return MoviesViewModel(repository) as T
+                return MoviesViewModel(repository, networkHelper) as T // Pass networkHelper here
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
+
 }

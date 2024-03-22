@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -60,22 +61,25 @@ class MoviesRepository @Inject constructor(
     }
 
     fun getPopularMovies(needToRefresh: Boolean, apiKey: String): Flow<List<PresentationMovie>> = flow {
-        moviesDao.getAllMovies().collect { localMovies ->
-            if (localMovies.isEmpty() || needToRefresh) {
-                try {
-                    val apiMovies = moviesApiService.getPopularMovies(apiKey).results
-                    val popularMovies = apiMovies.map { it.toPopularMovieEntity() } // Convert API movies to PopularMovie entities
-                    moviesDao.insertAll(popularMovies) // Insert them into the database
-                    emit(popularMovies.map { it.toPresentationMovie() }) // Convert to PresentationMovie before emitting
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error fetching from API", e)
-                    emit(emptyList<PresentationMovie>()) // Emit an empty list in case of error
-                }
-            } else {
-                // Ensure this map transforms PopularMovie to PresentationMovie
-                emit(localMovies.map { it.toPresentationMovie() })
+        val localMovies = moviesDao.getAllMovies().first()
+        if (localMovies.isEmpty() || needToRefresh) {
+            try {
+                val apiMovies = moviesApiService.getPopularMovies(apiKey).results
+                val popularMovies = apiMovies.map { it.toPopularMovieEntity() }
+                moviesDao.insertAll(popularMovies)
+                emit(popularMovies.map { it.toPresentationMovie() })
+            } catch (e: Exception) {
+                // Log the error here but do not emit anything.
+                // Emitting from here would violate flow exception transparency.
+                Log.e(TAG, "Error fetching from API", e)
             }
+        } else {
+            emit(localMovies.map { it.toPresentationMovie() })
         }
+    }.catch { e ->
+        // Handle or log the exception here. Optionally, you can emit a fallback value.
+        Log.e(TAG, "Error in flow: ", e)
+        emit(emptyList())
     }
 
 
