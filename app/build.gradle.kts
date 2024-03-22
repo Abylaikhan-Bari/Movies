@@ -49,6 +49,7 @@ android {
 
 dependencies {
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
     val nav_version = "2.7.7"
     val room_version = "2.6.1"
 

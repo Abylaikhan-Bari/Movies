@@ -45,7 +45,7 @@ class MoviesListFragment : Fragment() {
         // Setup swipe to refresh action
         val apiKey = "16d4b76831709bc650217ad5df094731"
         binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.refreshMovies(true, apiKey)
+            viewModel.refreshMovies(true)
         }
 
         // Observing movies list to update UI
