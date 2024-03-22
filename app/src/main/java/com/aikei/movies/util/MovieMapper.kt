@@ -5,6 +5,7 @@ import com.aikei.movies.data.api.model.MovieDetails
 import com.aikei.movies.data.db.entities.PopularMovie
 import com.aikei.movies.data.api.model.Genre
 import com.aikei.movies.presentation.model.PresentationMovie
+import com.aikei.movies.util.MovieMapper.toPresentationMovie
 
 object MovieMapper {
 
@@ -39,7 +40,7 @@ object MovieMapper {
         title = this.title,
         posterUrl = this.posterUrl, // Make sure the posterPath matches the field in PresentationMovie
         overview = this.overview,
-        releaseDate = this.releaseDate,
+        releaseDate = this.releaseDate ?: "Not Available",
         rating = this.rating,
         genres = this.genres.map { genre -> Genre(genre.id, genre.name) }, // Map Genre from MovieDetails to Genre in PresentationMovie
         runtime = this.runtime

@@ -23,6 +23,7 @@ import com.aikei.movies.data.repository.MoviesRepository
 import com.aikei.movies.presentation.model.PresentationMovie
 import com.aikei.movies.presentation.viewmodel.FavoritesViewModel
 import com.aikei.movies.presentation.viewmodel.MovieDetailViewModel
+import com.aikei.movies.util.MovieMapper.mapToPresentation
 import kotlinx.coroutines.launch
 
 class MovieDetailFragment : Fragment() {
@@ -78,7 +79,7 @@ class MovieDetailFragment : Fragment() {
             title = title,
             overview = overview,
             posterUrl = posterUrl,
-            releaseDate = releaseDate,
+            releaseDate = this.releaseDate ?: "Not Available",
             rating = rating,
             genres = genres,
             runtime = runtime
@@ -126,7 +127,10 @@ class MovieDetailFragment : Fragment() {
             // Observe the LiveData within the ViewModel to check if the movie is a favorite
             favoritesViewModel.isMovieFavorite(currentMovie.id).observe(viewLifecycleOwner) { isFavorite ->
                 if (!isFavorite) {
-                    favoritesViewModel.addFavorite(currentMovie.id, currentMovie.title, currentMovie.posterUrl, currentMovie.releaseDate, currentMovie.rating)
+                    currentMovie.releaseDate?.let {
+                        favoritesViewModel.addFavorite(currentMovie.id, currentMovie.title, currentMovie.posterUrl,
+                            it, currentMovie.rating)
+                    }
                 } else {
                     favoritesViewModel.removeFavorite(currentMovie.id)
                 }
