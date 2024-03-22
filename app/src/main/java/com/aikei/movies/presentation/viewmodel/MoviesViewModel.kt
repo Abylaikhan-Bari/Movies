@@ -1,5 +1,7 @@
 package com.aikei.movies.presentation.viewmodel
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -36,13 +38,24 @@ class MoviesViewModel(private val repository: MoviesRepository, private val netw
         }
     }
     fun refreshMovies(needToRefresh: Boolean, apiKey: String) {
-        _isLoading.value = true // Indicate loading start
+        _isLoading.value = true // Start loading
         viewModelScope.launch {
-            // Perform data refresh operations...
-            // After refreshing data:
-            _isLoading.value = false // Indicate loading end
+            try {
+                // Since repository.refreshMovies does not return a value but updates a flow,
+                // you initiate the refresh and then collect the latest data from the flow.
+                repository.refreshMovies(needToRefresh, apiKey, this)
+                // Assuming repository.getPopularMovies updates _moviesFlow inside the repository,
+                // and movies is a LiveData observing _moviesFlow, no further action is required here.
+                // Just stop the loading indicator at the end.
+            } catch (e: Exception) {
+                Log.e(TAG, "Error refreshing movies: ", e)
+                // Optionally handle the error, e.g., by showing a message to the user
+            } finally {
+                _isLoading.postValue(false) // Stop loading irrespective of success or error
+            }
         }
     }
+
 
 
 }
