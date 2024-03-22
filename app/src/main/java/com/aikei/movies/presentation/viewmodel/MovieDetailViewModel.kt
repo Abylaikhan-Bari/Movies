@@ -16,7 +16,7 @@ class MovieDetailViewModel(private val repository: MoviesRepository) : ViewModel
                 posterUrl = details.posterUrl,
                 overview = details.overview,
                 releaseDate = details.releaseDate,
-                voteAverage = details.voteAverage,
+                rating = details.rating,
                 genres = details.genres, // Assuming genres is directly usable
                 runtime = details.runtime
             )

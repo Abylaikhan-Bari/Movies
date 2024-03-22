@@ -30,22 +30,26 @@ class MoviesListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize the adapter with an empty list and set up click listener to navigate
+        // Initializing the adapter with an empty list and set up click listener to navigate
         moviesAdapter = MoviesAdapter { movie ->
-            // Assuming you have a movie object with a valid ID
             val action = MoviesListFragmentDirections.actionMoviesListFragmentToMovieDetailFragment(movie.id)
             findNavController().navigate(action)
         }
 
         setupRecyclerView()
 
-        val factory = ViewModelFactory((requireActivity().application as MyApp).repository)
+        // `MyApp` has a way to provide a `MoviesRepository` instance
+        val app = requireActivity().application as MyApp
+        val factory = ViewModelFactory(app.repository)
         viewModel = ViewModelProvider(this, factory).get(MoviesViewModel::class.java)
 
-        viewModel.getPopularMovies("16d4b76831709bc650217ad5df094731").observe(viewLifecycleOwner) { movies ->
-            movies?.let {
-                moviesAdapter.submitList(it) // Update adapter's dataset
-            }
+        // 'needToRefresh' is a dynamic value
+        val needToRefresh = false
+
+        // The apiKey
+        val apiKey = "16d4b76831709bc650217ad5df094731"
+        viewModel.getPopularMovies(needToRefresh, apiKey).observe(viewLifecycleOwner) { movies ->
+            moviesAdapter.submitList(movies) // Update adapter's dataset
         }
     }
 

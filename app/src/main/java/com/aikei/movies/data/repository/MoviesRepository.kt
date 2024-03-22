@@ -2,6 +2,8 @@ package com.aikei.movies.data.repository
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.map
 import com.aikei.movies.data.api.model.Genre
 import com.aikei.movies.data.api.model.Movie
 import com.aikei.movies.data.api.model.MovieDetails
@@ -9,29 +11,48 @@ import com.aikei.movies.data.api.model.MovieResponse
 import com.aikei.movies.data.api.service.MoviesApiService
 import com.aikei.movies.data.db.dao.MoviesDao
 import com.aikei.movies.data.db.entities.FavoriteMovie
+import com.aikei.movies.data.db.entities.PopularMovie
 import com.aikei.movies.presentation.model.PresentationMovie
+import com.aikei.movies.util.MovieMapper
+import com.aikei.movies.util.MovieMapper.mapToPresentation
+import com.aikei.movies.util.MovieMapper.toPopularMovieEntity
+import com.aikei.movies.util.MovieMapper.toPresentationMovie
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class MoviesRepository(private val moviesApiService: MoviesApiService,
-                       private val moviesDao: MoviesDao
+@Singleton
+class MoviesRepository @Inject constructor(
+    private val moviesApiService: MoviesApiService,
+    private val moviesDao: MoviesDao
 ) {
-
     companion object {
         private const val TAG = "MoviesRepository"
     }
 
-    suspend fun getPopularMovies(apiKey: String): List<Movie>? {
-        return try {
-            val response = moviesApiService.getPopularMovies(apiKey)
-            response.results
-        } catch (e: HttpException) {
-            Log.e(TAG, "getPopularMovies: HTTP exception", e)
-            null
-        } catch (e: Throwable) {
-            Log.e(TAG, "getPopularMovies: Error", e)
-            null
+    fun getPopularMovies(needToRefresh: Boolean, apiKey: String): Flow<List<PresentationMovie>> = flow {
+        moviesDao.getAllMovies().collect { localMovies ->
+            if (localMovies.isEmpty() || needToRefresh) {
+                try {
+                    val apiMovies = moviesApiService.getPopularMovies(apiKey).results
+                    val popularMovies = apiMovies.map { it.toPopularMovieEntity() } // Convert API movies to PopularMovie entities
+                    moviesDao.insertAll(popularMovies) // Insert them into the database
+                    emit(popularMovies.map { it.toPresentationMovie() }) // Convert to PresentationMovie before emitting
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error fetching from API", e)
+                    emit(emptyList<PresentationMovie>()) // Emit an empty list in case of error
+                }
+            } else {
+                // Ensure this map transforms PopularMovie to PresentationMovie
+                emit(localMovies.map { it.toPresentationMovie() })
+            }
         }
     }
+
+
+
 
     suspend fun getMovieDetails(movieId: Int, apiKey: String): PresentationMovie? {
         return try {
@@ -57,7 +78,7 @@ class MoviesRepository(private val moviesApiService: MoviesApiService,
         val favoriteMovie = FavoriteMovie(
             movieId = movieId,
             title = title,
-            posterPath = posterPath,
+            posterUrl = posterPath,
             releaseDate = releaseDate,
             rating = rating
         )
@@ -78,37 +99,6 @@ class MoviesRepository(private val moviesApiService: MoviesApiService,
         return moviesDao.getFavoriteMovies() // Ensure this method exists in MoviesDao
     }
 
-    // Extension function to map MovieResponse to List<PresentationMovie>
-    private fun MovieResponse?.mapToPresentation(): List<PresentationMovie>? {
-        return this?.results?.map { movie ->
-            PresentationMovie(
-                id = movie.id,
-                title = movie.title,
-                posterUrl = movie.posterUrl,
-                overview = movie.overview,
-                releaseDate = movie.release_date,
-                voteAverage = movie.vote_average,
-                genres = emptyList(), // Assuming no genre information is available here
-                runtime = 0 // Assuming no runtime information is available here
-            )
-        }
-    }
 
-
-    // Extension function to map MovieDetails to PresentationMovie
-    private fun MovieDetails?.mapToPresentation(): PresentationMovie? {
-        return this?.let { movieDetails ->
-            PresentationMovie(
-                id = movieDetails.id,
-                title = movieDetails.title,
-                posterUrl = movieDetails.posterUrl,
-                overview = movieDetails.overview,
-                releaseDate = movieDetails.release_date,
-                voteAverage = movieDetails.vote_average,
-                genres = movieDetails.genres.map { genre -> Genre(genre.id, genre.name) }, // Convert each Genre to your Presentation Genre
-                runtime = movieDetails.runtime
-            )
-        }
-    }
 
 }

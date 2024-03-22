@@ -78,8 +78,8 @@ class MovieDetailFragment : Fragment() {
             title = title,
             overview = overview,
             posterUrl = posterUrl,
-            release_date = releaseDate,
-            vote_average = voteAverage,
+            releaseDate = releaseDate,
+            rating = rating,
             genres = genres,
             runtime = runtime
         )
@@ -126,7 +126,7 @@ class MovieDetailFragment : Fragment() {
             // Observe the LiveData within the ViewModel to check if the movie is a favorite
             favoritesViewModel.isMovieFavorite(currentMovie.id).observe(viewLifecycleOwner) { isFavorite ->
                 if (!isFavorite) {
-                    favoritesViewModel.addFavorite(currentMovie.id, currentMovie.title, currentMovie.posterUrl, currentMovie.releaseDate, currentMovie.voteAverage)
+                    favoritesViewModel.addFavorite(currentMovie.id, currentMovie.title, currentMovie.posterUrl, currentMovie.releaseDate, currentMovie.rating)
                 } else {
                     favoritesViewModel.removeFavorite(currentMovie.id)
                 }
