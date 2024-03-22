@@ -1,4 +1,4 @@
 package com.aikei.movies.di
 
-class AppModule {
+object AppModule {
 }
