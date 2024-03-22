@@ -5,11 +5,13 @@ import androidx.room.Room
 import com.aikei.movies.data.api.service.MoviesApiService
 import com.aikei.movies.data.db.AppDatabase
 import com.aikei.movies.data.repository.MoviesRepository
+import dagger.hilt.android.HiltAndroidApp
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+@HiltAndroidApp
 class MyApp : Application() {
     lateinit var repository: MoviesRepository
         private set
