@@ -4,7 +4,8 @@ plugins {
     id("kotlin-kapt")
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.android")
-    id("androidx.navigation.safeargs.kotlin") // Apply the Safe Args plugin
+    id("com.google.dagger.hilt.android")
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 
@@ -41,12 +42,22 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    kapt{
+        correctErrorTypes = true
+    }
 }
 
 dependencies {
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
     val nav_version = "2.7.7"
     val room_version = "2.6.1"
 
+    //Dagger-Hilt
+    implementation("com.google.dagger:hilt-android:2.44")
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
+    implementation("com.google.dagger:dagger:2.48")
+    kapt("com.google.dagger:dagger-compiler:2.48")
     // Room dependencies
     implementation("androidx.room:room-runtime:$room_version")
     kapt("androidx.room:room-compiler:$room_version") // Corrected for Kotlin

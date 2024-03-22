@@ -42,7 +42,7 @@ class FavoritesAdapter : RecyclerView.Adapter<FavoritesAdapter.FavoriteViewHolde
 
         fun bind(movie: FavoriteMovie) {
             val baseUrl = "https://image.tmdb.org/t/p/w500" // Example base URL
-            val fullPath = baseUrl + movie.posterPath
+            val fullPath = baseUrl + movie.posterUrl
 
             Glide.with(itemView.context)
                 .load(fullPath)

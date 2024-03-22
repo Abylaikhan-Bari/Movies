@@ -2,36 +2,83 @@ package com.aikei.movies.data.repository
 
 import android.util.Log
 import androidx.lifecycle.LiveData
-import com.aikei.movies.data.api.model.Genre
-import com.aikei.movies.data.api.model.Movie
-import com.aikei.movies.data.api.model.MovieDetails
-import com.aikei.movies.data.api.model.MovieResponse
 import com.aikei.movies.data.api.service.MoviesApiService
 import com.aikei.movies.data.db.dao.MoviesDao
 import com.aikei.movies.data.db.entities.FavoriteMovie
 import com.aikei.movies.presentation.model.PresentationMovie
+import com.aikei.movies.util.MovieMapper.mapToPresentation
+import com.aikei.movies.util.MovieMapper.toPopularMovieEntity
+import com.aikei.movies.util.MovieMapper.toPresentationMovie
+import com.aikei.movies.work.UpdateCacheWorker
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class MoviesRepository(private val moviesApiService: MoviesApiService,
-                       private val moviesDao: MoviesDao
+@Singleton
+class MoviesRepository @Inject constructor(
+    private val moviesApiService: MoviesApiService,
+    private val moviesDao: MoviesDao
 ) {
-
+    private val _moviesFlow = MutableStateFlow<List<PresentationMovie>>(emptyList())
+    val moviesFlow = _moviesFlow.asStateFlow()
     companion object {
         private const val TAG = "MoviesRepository"
     }
-
-    suspend fun getPopularMovies(apiKey: String): List<Movie>? {
-        return try {
-            val response = moviesApiService.getPopularMovies(apiKey)
-            response.results
-        } catch (e: HttpException) {
-            Log.e(TAG, "getPopularMovies: HTTP exception", e)
-            null
-        } catch (e: Throwable) {
-            Log.e(TAG, "getPopularMovies: Error", e)
-            null
+    suspend fun refreshMovies(
+        needToRefresh: Boolean,
+        apiKey: String
+    ): Boolean {
+        val localMovies = moviesDao.getAllMovies().first()
+        if (localMovies.isEmpty() || needToRefresh) {
+            return try {
+                val apiMovies = moviesApiService.getPopularMovies(apiKey).results
+                val popularMovies = apiMovies.map { it.toPopularMovieEntity() }
+                moviesDao.insertAll(popularMovies)
+                _moviesFlow.emit(popularMovies.map { it.toPresentationMovie() })
+                true // Indicate success
+            } catch (e: Exception) {
+                Log.e(TAG, "Error fetching from API", e)
+                _moviesFlow.emit(emptyList()) // Emit an empty list in case of error
+                false // Indicate failure
+            }
+        } else {
+            _moviesFlow.emit(localMovies.map { it.toPresentationMovie() })
+            return true // Indicate success as the local cache is already up to date
         }
     }
+
+
+
+    fun getPopularMovies(needToRefresh: Boolean, apiKey: String): Flow<List<PresentationMovie>> = flow {
+        val localMovies = moviesDao.getAllMovies().first()
+        if (localMovies.isEmpty() || needToRefresh) {
+            try {
+                val apiMovies = moviesApiService.getPopularMovies(apiKey).results
+                val popularMovies = apiMovies.map { it.toPopularMovieEntity() }
+                moviesDao.insertAll(popularMovies)
+                emit(popularMovies.map { it.toPresentationMovie() })
+            } catch (e: Exception) {
+                // Log the error here but do not emit anything.
+                // Emitting from here would violate flow exception transparency.
+                Log.e(TAG, "Error fetching from API", e)
+            }
+        } else {
+            emit(localMovies.map { it.toPresentationMovie() })
+        }
+    }.catch { e ->
+        // Handle or log the exception here. Optionally, you can emit a fallback value.
+        Log.e(TAG, "Error in flow: ", e)
+        emit(emptyList())
+    }
+
+
+
 
     suspend fun getMovieDetails(movieId: Int, apiKey: String): PresentationMovie? {
         return try {
@@ -57,7 +104,7 @@ class MoviesRepository(private val moviesApiService: MoviesApiService,
         val favoriteMovie = FavoriteMovie(
             movieId = movieId,
             title = title,
-            posterPath = posterPath,
+            posterUrl = posterPath,
             releaseDate = releaseDate,
             rating = rating
         )
@@ -78,37 +125,6 @@ class MoviesRepository(private val moviesApiService: MoviesApiService,
         return moviesDao.getFavoriteMovies() // Ensure this method exists in MoviesDao
     }
 
-    // Extension function to map MovieResponse to List<PresentationMovie>
-    private fun MovieResponse?.mapToPresentation(): List<PresentationMovie>? {
-        return this?.results?.map { movie ->
-            PresentationMovie(
-                id = movie.id,
-                title = movie.title,
-                posterUrl = movie.posterUrl,
-                overview = movie.overview,
-                releaseDate = movie.release_date,
-                voteAverage = movie.vote_average,
-                genres = emptyList(), // Assuming no genre information is available here
-                runtime = 0 // Assuming no runtime information is available here
-            )
-        }
-    }
 
-
-    // Extension function to map MovieDetails to PresentationMovie
-    private fun MovieDetails?.mapToPresentation(): PresentationMovie? {
-        return this?.let { movieDetails ->
-            PresentationMovie(
-                id = movieDetails.id,
-                title = movieDetails.title,
-                posterUrl = movieDetails.posterUrl,
-                overview = movieDetails.overview,
-                releaseDate = movieDetails.release_date,
-                voteAverage = movieDetails.vote_average,
-                genres = movieDetails.genres.map { genre -> Genre(genre.id, genre.name) }, // Convert each Genre to your Presentation Genre
-                runtime = movieDetails.runtime
-            )
-        }
-    }
 
 }

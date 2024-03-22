@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -14,15 +15,18 @@ import com.aikei.movies.databinding.FragmentMoviesListBinding
 import com.aikei.movies.data.repository.MoviesRepository
 import com.aikei.movies.presentation.adapter.MoviesAdapter
 import com.aikei.movies.presentation.viewmodel.MoviesViewModel
+import com.aikei.movies.util.NetworkHelper
 
 class MoviesListFragment : Fragment() {
 
     private var _binding: FragmentMoviesListBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: MoviesViewModel
+    private val viewModel: MoviesViewModel by viewModels {
+        ViewModelFactory((requireActivity().application as MyApp).repository, NetworkHelper(requireContext()))
+    }
     private lateinit var moviesAdapter: MoviesAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentMoviesListBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -30,22 +34,28 @@ class MoviesListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize the adapter with an empty list and set up click listener to navigate
+        // Initializing the adapter with an empty list and setup click listener to navigate
         moviesAdapter = MoviesAdapter { movie ->
-            // Assuming you have a movie object with a valid ID
             val action = MoviesListFragmentDirections.actionMoviesListFragmentToMovieDetailFragment(movie.id)
             findNavController().navigate(action)
         }
 
         setupRecyclerView()
 
-        val factory = ViewModelFactory((requireActivity().application as MyApp).repository)
-        viewModel = ViewModelProvider(this, factory).get(MoviesViewModel::class.java)
+        // Setup swipe to refresh action
+        val apiKey = "16d4b76831709bc650217ad5df094731"
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.refreshMovies(true)
+        }
 
-        viewModel.getPopularMovies("16d4b76831709bc650217ad5df094731").observe(viewLifecycleOwner) { movies ->
-            movies?.let {
-                moviesAdapter.submitList(it) // Update adapter's dataset
-            }
+        // Observing movies list to update UI
+        viewModel.movies.observe(viewLifecycleOwner) { movies ->
+            moviesAdapter.submitList(movies)
+        }
+
+        // Observing loading state to show or hide the refreshing animation
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.swipeRefreshLayout.isRefreshing = isLoading
         }
     }
 
@@ -59,11 +69,11 @@ class MoviesListFragment : Fragment() {
         _binding = null
     }
 
-    class ViewModelFactory(private val repository: MoviesRepository) : ViewModelProvider.Factory {
+    class ViewModelFactory(private val repository: MoviesRepository, private val networkHelper: NetworkHelper) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(MoviesViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return MoviesViewModel(repository) as T
+                return MoviesViewModel(repository, networkHelper) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

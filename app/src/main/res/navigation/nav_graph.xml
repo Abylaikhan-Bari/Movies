@@ -29,5 +29,4 @@
         android:id="@+id/favoritesFragment"
         android:name="com.aikei.movies.presentation.fragment.FavoritesFragment"
         android:label="Favorites" />
-
 </navigation>

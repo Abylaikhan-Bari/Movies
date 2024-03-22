@@ -8,8 +8,8 @@ data class MovieDetails(
     val overview: String,
     @SerializedName("poster_path") // This annotation maps the JSON field to this Kotlin property
     val posterUrl: String,
-    val release_date: String,
-    val vote_average: Double,
+    val releaseDate: String,
+    val rating: Double,
     val genres: List<Genre>,
     val runtime: Int
 )

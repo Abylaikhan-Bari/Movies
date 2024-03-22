@@ -7,8 +7,8 @@ data class PresentationMovie(
     val title: String,
     val posterUrl: String,
     val overview: String,
-    val releaseDate: String,
-    val voteAverage: Double,
+    val releaseDate: String?,
+    val rating: Double,
     val genres: List<Genre>, // Assuming Genre is a defined data class
     val runtime: Int
 )
