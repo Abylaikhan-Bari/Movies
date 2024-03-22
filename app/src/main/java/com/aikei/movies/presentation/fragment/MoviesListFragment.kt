@@ -24,13 +24,17 @@ class MoviesListFragment : Fragment() {
     private val viewModel: MoviesViewModel by viewModels {
         ViewModelFactory((requireActivity().application as MyApp).repository, NetworkHelper(requireContext()))
     }
-
     private lateinit var moviesAdapter: MoviesAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentMoviesListBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        // Initializing the adapter with an empty list and set up click listener to navigate
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Initializing the adapter with an empty list and setup click listener to navigate
         moviesAdapter = MoviesAdapter { movie ->
             val action = MoviesListFragmentDirections.actionMoviesListFragmentToMovieDetailFragment(movie.id)
             findNavController().navigate(action)
@@ -38,17 +42,21 @@ class MoviesListFragment : Fragment() {
 
         setupRecyclerView()
 
-        val apiKey =  "16d4b76831709bc650217ad5df094731"
+        // Setup swipe to refresh action
+        val apiKey = "16d4b76831709bc650217ad5df094731"
         binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.refreshMovies(true, apiKey) // Trigger data refresh
+            viewModel.refreshMovies(true, apiKey)
         }
 
+        // Observing movies list to update UI
         viewModel.movies.observe(viewLifecycleOwner) { movies ->
-            moviesAdapter.submitList(movies) // Update adapter's dataset
-            binding.swipeRefreshLayout.isRefreshing = false // Stop the refreshing animation
+            moviesAdapter.submitList(movies)
         }
 
-        return binding.root
+        // Observing loading state to show or hide the refreshing animation
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.swipeRefreshLayout.isRefreshing = isLoading
+        }
     }
 
     private fun setupRecyclerView() {
@@ -65,10 +73,9 @@ class MoviesListFragment : Fragment() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(MoviesViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return MoviesViewModel(repository, networkHelper) as T // Pass networkHelper here
+                return MoviesViewModel(repository, networkHelper) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
-
 }

@@ -18,6 +18,9 @@ class MoviesViewModel(private val repository: MoviesRepository, private val netw
     private val _movies = MutableLiveData<List<PresentationMovie>>()
     val movies: LiveData<List<PresentationMovie>> = _movies
     val apiKey = "16d4b76831709bc650217ad5df094731"
+    // LiveData to track loading state
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
     init {
         loadMovies()
     }
@@ -33,7 +36,13 @@ class MoviesViewModel(private val repository: MoviesRepository, private val netw
         }
     }
     fun refreshMovies(needToRefresh: Boolean, apiKey: String) {
-        repository.refreshMovies(needToRefresh, apiKey, viewModelScope)
+        _isLoading.value = true // Indicate loading start
+        viewModelScope.launch {
+            // Perform data refresh operations...
+            // After refreshing data:
+            _isLoading.value = false // Indicate loading end
+        }
     }
+
 
 }
