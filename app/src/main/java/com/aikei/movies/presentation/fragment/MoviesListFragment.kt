@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -19,16 +20,13 @@ class MoviesListFragment : Fragment() {
 
     private var _binding: FragmentMoviesListBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: MoviesViewModel
+    private val viewModel: MoviesViewModel by viewModels {
+        ViewModelFactory((requireActivity().application as MyApp).repository)
+    }
     private lateinit var moviesAdapter: MoviesAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentMoviesListBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
         // Initializing the adapter with an empty list and set up click listener to navigate
         moviesAdapter = MoviesAdapter { movie ->
@@ -38,19 +36,17 @@ class MoviesListFragment : Fragment() {
 
         setupRecyclerView()
 
-        // `MyApp` has a way to provide a `MoviesRepository` instance
-        val app = requireActivity().application as MyApp
-        val factory = ViewModelFactory(app.repository)
-        viewModel = ViewModelProvider(this, factory).get(MoviesViewModel::class.java)
-
-        // 'needToRefresh' is a dynamic value
-        val needToRefresh = false
-
-        // The apiKey
-        val apiKey = "16d4b76831709bc650217ad5df094731"
-        viewModel.getPopularMovies(needToRefresh, apiKey).observe(viewLifecycleOwner) { movies ->
-            moviesAdapter.submitList(movies) // Update adapter's dataset
+        val apiKey =  "16d4b76831709bc650217ad5df094731"
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.refreshMovies(true, apiKey) // Trigger data refresh
         }
+
+        viewModel.movies.observe(viewLifecycleOwner) { movies ->
+            moviesAdapter.submitList(movies) // Update adapter's dataset
+            binding.swipeRefreshLayout.isRefreshing = false // Stop the refreshing animation
+        }
+
+        return binding.root
     }
 
     private fun setupRecyclerView() {

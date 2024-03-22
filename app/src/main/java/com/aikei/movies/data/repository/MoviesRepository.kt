@@ -17,8 +17,14 @@ import com.aikei.movies.util.MovieMapper
 import com.aikei.movies.util.MovieMapper.mapToPresentation
 import com.aikei.movies.util.MovieMapper.toPopularMovieEntity
 import com.aikei.movies.util.MovieMapper.toPresentationMovie
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,8 +34,29 @@ class MoviesRepository @Inject constructor(
     private val moviesApiService: MoviesApiService,
     private val moviesDao: MoviesDao
 ) {
+    private val _moviesFlow = MutableStateFlow<List<PresentationMovie>>(emptyList())
+    val moviesFlow = _moviesFlow.asStateFlow()
     companion object {
         private const val TAG = "MoviesRepository"
+    }
+    fun refreshMovies(needToRefresh: Boolean, apiKey: String, coroutineScope: CoroutineScope) {
+        coroutineScope.launch(Dispatchers.IO) {
+            val localMovies = moviesDao.getAllMovies().first()
+            if (localMovies.isEmpty() || needToRefresh) {
+                try {
+                    val apiMovies = moviesApiService.getPopularMovies(apiKey).results
+                    val popularMovies = apiMovies.map { it.toPopularMovieEntity() }
+                    moviesDao.insertAll(popularMovies)
+                    _moviesFlow.emit(popularMovies.map { it.toPresentationMovie() })
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error fetching from API", e)
+                    // Emit an empty list in case of error
+                    _moviesFlow.emit(emptyList())
+                }
+            } else {
+                _moviesFlow.emit(localMovies.map { it.toPresentationMovie() })
+            }
+        }
     }
 
     fun getPopularMovies(needToRefresh: Boolean, apiKey: String): Flow<List<PresentationMovie>> = flow {
