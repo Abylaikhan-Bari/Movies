@@ -33,7 +33,7 @@ object NotificationHelper {
 
         // Build the notification and issue it
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_notification) // Replace this with your notification icon
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(context.getString(R.string.notification_title_cache_updated))
             .setContentText(context.getString(R.string.notification_content_cache_updated))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
