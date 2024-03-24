@@ -1,6 +1,5 @@
 package com.aikei.movies.receivers
 
-
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
