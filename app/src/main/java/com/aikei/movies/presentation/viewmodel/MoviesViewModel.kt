@@ -24,6 +24,7 @@ class MoviesViewModel(private val repository: MoviesRepository, private val netw
         loadMovies()
     }
 
+
     fun loadMovies() {
         viewModelScope.launch(Dispatchers.IO) {
             if (networkHelper.isNetworkConnected()) {
