@@ -16,5 +16,6 @@
     <string name="channel_description_cache_update">Notifications about cache updates</string>
     <string name="notification_title_cache_updated">Cache Updated</string>
     <string name="notification_content_cache_updated">The cache has been successfully updated.</string>
+    <string name="movie_poster_cd">Movie poster</string>
 
 </resources>

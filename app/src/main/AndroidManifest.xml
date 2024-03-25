@@ -23,7 +23,8 @@
         tools:targetApi="31">
         <receiver android:name=".receivers.CacheUpdateReceiver"
             android:exported="true"
-            tools:ignore="WrongManifestParent">
+            tools:ignore="WrongManifestParent"
+            android:permission="TODO">
             <intent-filter>
                 <action android:name="ACTION_CACHE_UPDATED" />
             </intent-filter>

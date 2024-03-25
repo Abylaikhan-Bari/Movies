@@ -1,6 +1,7 @@
 package com.aikei.movies
 
 import android.app.Application
+import android.util.Log
 import androidx.room.Room
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
@@ -24,6 +25,7 @@ class MyApp : Application() {
     override fun onCreate() {
         super.onCreate()
         setupPeriodicWork()
+
         // Setup logging interceptor for OkHttpClient
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
@@ -60,5 +62,6 @@ class MyApp : Application() {
             ExistingPeriodicWorkPolicy.KEEP,
             workRequest
         )
+        Log.d("MyApp", "Periodic Work for cache update enqueued")
     }
 }

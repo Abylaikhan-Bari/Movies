@@ -34,6 +34,10 @@ android {
     }
     buildFeatures{
         viewBinding = true
+        compose = true
+    }
+    composeOptions{
+        kotlinCompilerExtensionVersion = "1.5.11"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -56,8 +60,6 @@ dependencies {
     //Dagger-Hilt
     implementation("com.google.dagger:hilt-android:2.44")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
-    implementation("com.google.dagger:dagger:2.48")
-    kapt("com.google.dagger:dagger-compiler:2.48")
     // Room dependencies
     implementation("androidx.room:room-runtime:$room_version")
     kapt("androidx.room:room-compiler:$room_version") // Corrected for Kotlin
@@ -67,6 +69,18 @@ dependencies {
     // Retrofit for network calls
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    //Compose
+    implementation("androidx.compose.ui:ui:1.6.4")
+    implementation("androidx.compose.material:material:1.6.4")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.6.4")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.activity:activity-compose:1.8.2")
+    // LiveData integration
+    implementation ("androidx.compose.runtime:runtime-livedata:1.6.4")
+    // Coil for Compose
+    implementation ("io.coil-kt:coil-compose:2.4.0")
+    // Accompanist Swipe Refresh
+    implementation ("com.google.accompanist:accompanist-swiperefresh:0.23.1")
 
     // Coil for image loading
     implementation("io.coil-kt:coil:2.4.0")

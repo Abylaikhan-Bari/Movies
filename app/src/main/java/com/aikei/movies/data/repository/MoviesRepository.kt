@@ -9,7 +9,6 @@ import com.aikei.movies.presentation.model.PresentationMovie
 import com.aikei.movies.util.MovieMapper.mapToPresentation
 import com.aikei.movies.util.MovieMapper.toPopularMovieEntity
 import com.aikei.movies.util.MovieMapper.toPresentationMovie
-import com.aikei.movies.work.UpdateCacheWorker
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -122,7 +121,7 @@ class MoviesRepository @Inject constructor(
     }
 
     fun getFavoriteMovies(): LiveData<List<FavoriteMovie>> {
-        return moviesDao.getFavoriteMovies() // Ensure this method exists in MoviesDao
+        return moviesDao.getFavoriteMovies()
     }
 
 

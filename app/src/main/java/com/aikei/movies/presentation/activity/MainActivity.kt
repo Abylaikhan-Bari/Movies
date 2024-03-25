@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
         // Prevent reselection of the current item
         bottomNavigationView.setOnItemReselectedListener { /* No-op */ }
     }
