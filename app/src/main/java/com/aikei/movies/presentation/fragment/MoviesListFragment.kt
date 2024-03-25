@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
 import com.aikei.movies.R
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -95,32 +96,36 @@ fun MovieItem(movie: PresentationMovie, navigateToMovieDetail: (Int) -> Unit) {
     Card(
         modifier = Modifier
             .padding(4.dp)
-            .fillMaxWidth(),
+            .size(120.dp, 200.dp), // Fixed size for the Card
         elevation = 4.dp
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .clickable { navigateToMovieDetail(movie.id) }
                 .padding(8.dp)
         ) {
-            AsyncImage(
-                model = "https://image.tmdb.org/t/p/w500${movie.posterUrl}",
-                contentDescription = stringResource(R.string.movie_poster_cd, movie.title),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(0.75f),
-                // Providing a placeholder for the loading state
-                placeholder = painterResource(R.drawable.ic_placeholder),
-                // Providing an image for the error state
-                error = painterResource(R.drawable.ic_error)
-            )
+            Box(modifier = Modifier.weight(1f)) {
+                AsyncImage(
+                    model = "https://image.tmdb.org/t/p/w500${movie.posterUrl}",
+                    contentDescription = stringResource(R.string.movie_poster_cd, movie.title),
+                    modifier = Modifier
+                        .fillMaxSize() // Fill the available space
+                        .aspectRatio(0.75f),
+                    // Providing a placeholder for the loading state
+                    placeholder = painterResource(R.drawable.ic_placeholder),
+                    // Providing an image for the error state
+                    error = painterResource(R.drawable.ic_error)
+                )
+            }
             Text(
                 text = movie.title,
                 style = MaterialTheme.typography.caption,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 8.dp)
+                    .wrapContentWidth() // Ensure the title doesn't exceed the card width
             )
         }
     }
