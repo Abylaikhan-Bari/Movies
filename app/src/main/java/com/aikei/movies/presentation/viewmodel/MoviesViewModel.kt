@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aikei.movies.BuildConfig
 import com.aikei.movies.data.repository.MoviesRepository
 import com.aikei.movies.presentation.model.PresentationMovie
 import com.aikei.movies.util.NetworkHelper
@@ -16,7 +17,7 @@ import kotlinx.coroutines.launch
 class MoviesViewModel(private val repository: MoviesRepository, private val networkHelper: NetworkHelper) : ViewModel() {
     private val _movies = MutableLiveData<List<PresentationMovie>>()
     val movies: LiveData<List<PresentationMovie>> = _movies
-    val apiKey = "16d4b76831709bc650217ad5df094731"
+    val apiKey = BuildConfig.API_KEY
     // LiveData to track loading state
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading

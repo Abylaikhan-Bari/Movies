@@ -5,6 +5,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.aikei.movies.BuildConfig
 import com.aikei.movies.R
 import com.aikei.movies.data.repository.MoviesRepository
 import com.aikei.movies.receivers.CacheUpdateReceiver
@@ -23,7 +24,7 @@ class UpdateCacheWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         Log.i(TAG, "Starting cache refresh work")
 
-        val apiKey = applicationContext.getString(R.string.api_key) // Use the resource value for the API key
+        val apiKey = BuildConfig.API_KEY // Use the resource value for the API key
 
         return try {
             // Update the cache by fetching from the repository

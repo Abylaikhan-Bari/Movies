@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -8,7 +10,10 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")
 }
 
-
+val localProperties = Properties().apply {
+    load(project.rootProject.file("local.properties").inputStream())
+}
+val apiKey = localProperties.getProperty("apiKey", "NO_API_KEY_FOUND")
 android {
     namespace = "com.aikei.movies"
     compileSdk = 34
@@ -17,10 +22,20 @@ android {
         applicationId = "com.aikei.movies"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "API_KEY", "\"$apiKey\"")
+        ndk {
+            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
+        }
+        externalNativeBuild {
+            cmake {
+                // Enable debug symbols
+                arguments("-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_CXX_FLAGS_RELEASE=-g")
+            }
+        }
     }
 
     buildTypes {
@@ -31,10 +46,26 @@ android {
                 "proguard-rules.pro"
             )
         }
+//        getByName("release") {
+//            isMinifyEnabled = true
+//            proguardFiles(
+//                getDefaultProguardFile("proguard-android-optimize.txt"),
+//                "proguard-rules.pro"
+//            )
+//            ndk {
+//                debugSymbolLevel = "FULL"
+//            }
+//        }
+//    }
+//    externalNativeBuild {
+//        cmake {
+//            path = file("src/main/cpp/CMakeLists.txt")
+//        }
     }
     buildFeatures{
         viewBinding = true
         compose = true
+        buildConfig = true
     }
     composeOptions{
         kotlinCompilerExtensionVersion = "1.5.11"

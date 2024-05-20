@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import coil.load
+import com.aikei.movies.BuildConfig
 import com.aikei.movies.MyApp
 import com.aikei.movies.R
 import com.aikei.movies.data.api.model.MovieDetails
@@ -57,7 +58,7 @@ class MovieDetailFragment : Fragment() {
     private fun fetchMovieDetails(movieId: Int) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                viewModel.getMovieDetails(movieId, "16d4b76831709bc650217ad5df094731").let { presentationMovie ->
+                viewModel.getMovieDetails(movieId, BuildConfig.API_KEY).let { presentationMovie ->
                     movie = presentationMovie // Now correctly handles null
                     presentationMovie?.let {
                         displayMovieDetails(convertToMovieDetails(it))
